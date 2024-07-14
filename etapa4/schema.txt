@@ -1,0 +1,9 @@
+    /*
+        Para um nodo ser BOOLEAN
+        seus filhos devem ser
+        > < >= <= com tipos NUMERIC ou REAL ralacional
+        ou
+        & | com tipos BOOLEAN logico
+        ou
+        == != com tipos BOOLEAN NUMERIC ou REAL equality
+    */
