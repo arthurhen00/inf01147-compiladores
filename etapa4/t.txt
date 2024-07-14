@@ -15,13 +15,13 @@ bool ba: true;
 int ifun(){}
 float ffun(){}
 
-char ca: 'a';
+char ca[3]: 'a' '2' 'a';
 
 int ires: 1;
 float fres: 1.1;
 
 int main() {
-  /*
+  
   ires = '1' + 2 + 3 + '4';
   ba = 1 + 2 > 3 + 4 + 5 + 6;
   fres = 1.1 + 2.2 + 3.3 + 4.1;
@@ -38,11 +38,13 @@ int main() {
   iv[1] = 'a' + 1;
   fv[1] = 1.1 + 2.2;
   ba = 1 != 2 & 3 > (4 + 5) * 6 & 7 > 8 | 9 > 0;
-  */
-
+  print float fa;
+  print bool 1 > 2;
+  print "carro";
+  
   //if (1 != 2 + 3 > (4 + 5) * 6 & 7 > 8 | 9 > 0); // ERRO
-  //ires = 1 + 2 > 3.1 + 4.1;           // Erro
-  //ires = 'a' + 2 * 3 > 4 / 5 + 6 < 7; //Erro
+  //res = 1 + 2 > 3.1 + 4.1;           // Erro
+  //res = 'a' + 2 * 3 > 4 / 5 + 6 < 7; //Erro
   //fres = 1 & 1;                       // erro
   //if (iv + iv);
   //ia[0] = ia[1] + ia[0];
@@ -52,5 +54,4 @@ int main() {
   //ires = 1;
   //ires = iv[1 > 2];
   //ires = 'a' + ires;
-
 }

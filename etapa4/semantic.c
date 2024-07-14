@@ -131,10 +131,49 @@ void checkOperands(ast_t *astNode) {
             }
             break;
         case AST_PRINT:
-
+            if (astNode->children[1]) {
+                if (nodesDataType[astNode->children[0]->type] == DATATYPE_INT 
+                    || nodesDataType[astNode->children[0]->type] == DATATYPE_CHAR) {
+                    if (!isNumeric(astNode->children[1])) {
+                        fprintf(stderr, "5.1Semantic ERROR: expected numeric type in print.\n");
+                        semanticErrors++;
+                    }
+                } else if (nodesDataType[astNode->children[0]->type] == DATATYPE_FLOAT) {
+                    if (!isReal(astNode->children[1])) {
+                        fprintf(stderr, "5.2Semantic ERROR: expected real type in print.\n");
+                        semanticErrors++;
+                    }
+                } else if (nodesDataType[astNode->children[0]->type] == DATATYPE_BOOL) {
+                    if (!isBoolean(astNode->children[1])) {
+                        fprintf(stderr, "5.3Semantic ERROR: expected boolean type in print.\n");
+                        semanticErrors++;
+                    }
+                }
+            } else {
+                if (astNode->symbol->type != SYMBOL_LIT_STRING) {
+                    fprintf(stderr, "6Semantic ERROR: must be a string.\n");
+                    semanticErrors++;
+                }
+            }
             break;
         case AST_READ:
-
+            if (nodesDataType[astNode->children[0]->type] == DATATYPE_INT
+                || nodesDataType[astNode->children[0]->type] == DATATYPE_CHAR) {
+                if (!isNumeric(astNode)) {
+                    fprintf(stderr, "7.1Semantic ERROR: expected numeric type in read.\n");
+                    semanticErrors++;
+                }
+            } else if (nodesDataType[astNode->children[0]->type] == DATATYPE_FLOAT) {
+                if (!isReal(astNode)) {
+                    fprintf(stderr, "7.2Semantic ERROR: expected real type in read.\n");
+                    semanticErrors++;
+                }
+            } else if (nodesDataType[astNode->children[0]->type] == DATATYPE_BOOL) {
+                if (!isBoolean(astNode)) {
+                    fprintf(stderr, "7.3Semantic ERROR: expected boolean type in read.\n");
+                    semanticErrors++;
+                }
+            }
             break;
     }
 
@@ -161,7 +200,8 @@ int isNumeric(ast_t *astNode) {
         || astNode->type == AST_VEC
         || astNode->type == AST_FUNC
         || astNode->type == AST_ASSIGN
-        || astNode->type == AST_VAR_DEC) {
+        || astNode->type == AST_VAR_DEC
+        || astNode->type == AST_READ) {
         if (astNode->symbol->datatype == DATATYPE_INT || astNode->symbol->datatype == DATATYPE_CHAR) {
             return 1;
         }
@@ -187,7 +227,8 @@ int isReal(ast_t *astNode) {
         || astNode->type == AST_VEC
         || astNode->type == AST_FUNC
         || astNode->type == AST_ASSIGN
-        || astNode->type == AST_VAR_DEC) {
+        || astNode->type == AST_VAR_DEC
+        || astNode->type == AST_READ) {
         if (astNode->symbol->datatype == DATATYPE_FLOAT) {
             return 1;
         }
@@ -225,7 +266,8 @@ int isBoolean(ast_t *astNode) {
         || astNode->type == AST_VEC
         || astNode->type == AST_FUNC
         || astNode->type == AST_ASSIGN
-        || astNode->type == AST_VAR_DEC) {
+        || astNode->type == AST_VAR_DEC
+        || astNode->type == AST_READ) {
         if (astNode->symbol->datatype == DATATYPE_BOOL) {
             return 1;
         }
@@ -300,6 +342,7 @@ void checkIdentifiers(ast_t *astNode) {
             }
             break;
         case AST_SYMBOL:
+        case AST_READ: // HERE maybe remove
             if (!isLiteral(astNode) 
                 && astNode->symbol->type != SYMBOL_IDENTIFIER) {
                 fprintf(stderr, "4Semantic ERROR: Incorrect usage of identifier. '%s' is a vector.\n", astNode->symbol->str);

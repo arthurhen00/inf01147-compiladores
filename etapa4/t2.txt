@@ -10,9 +10,9 @@
 char a:15;
 bool b: false;
 int v[10]: 'a' 0'b'0 0 0 0 0 0 0;
-int p[10]: 'a' 0'b'0 0 0 0 0 0 0 13 31 21;  //ERRO MTO VALORES
+//int p[10]: 'a' 0'b'0 0 0 0 0 0 0 13 31 21;  //ERRO MTO VALORES
 
-int m: 3.2; // ERRO tipo errado na declaração
+//int m: 3.2; // ERRO tipo errado na declaração
 
 int main ()
   {
@@ -33,12 +33,12 @@ int main ()
    //print float a; //ERRO tipo errado
 
 
-   read float a; //ERRO tipo errado
-   a = double(3.3); //ERRO tipo arg errado
-   a = double(3 , 3); //ERRO mto param
+   //read float a; //ERRO tipo errado
+   //a = double(3.3); //ERRO tipo arg errado
+   //a = double(3 , 3); //ERRO mto param
    // return 1.1; //ERRO tipo errado
   }
 
 char double(int x){
-  return x * x ;
+  //return x * x ;
 }
