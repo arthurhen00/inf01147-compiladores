@@ -79,42 +79,6 @@ int checkUndeclared(hash_t *hashNode[]) {
     return semanticErrors;
 }
 
-void checkAssign(ast_t *astNode) {
-    if(astNode == NULL) {
-        return;
-    }
-
-    switch (astNode->type) {
-        case AST_ASSIGN:
-            if (isNumeric(astNode)) {
-                if (!(isNumeric(astNode->children[0]))) {
-                    fprintf(stderr, "1Semantic ERROR: incompatible assign types.\n");
-                    semanticErrors++;
-                }
-            } else if (astNode->symbol->datatype != getExpressionDataType(astNode->children[0])) {
-                fprintf(stderr, "2Semantic ERROR: incompatible assign types.\n");
-                semanticErrors++;
-            }
-            break;
-        case AST_VEC_ASSIGN:
-            if (isNumeric(astNode->children[0])) {
-                if (!(isNumeric(astNode->children[1]))){
-                    fprintf(stderr, "1Semantic ERROR: incompatible vector assign types.\n");
-                    semanticErrors++;
-                }
-            } else if (astNode->children[0]->symbol->datatype != getExpressionDataType(astNode->children[1])) {
-                fprintf(stderr, "2Semantic ERROR: incompatible vector assign types.\n");
-                semanticErrors++;
-            }
-            break;
-    }
-
-    for (int i = 0; i < MAX_CHILDREN; i++) {
-        checkOperands(astNode->children[i]);
-    }
-    
-}
-
 void checkOperands(ast_t *astNode) {
     if(astNode == NULL) {
         return;
@@ -168,40 +132,6 @@ void checkOperands(ast_t *astNode) {
         checkOperands(astNode->children[i]);
     }
     
-}
-
-int getExpressionDataType(ast_t *astNode) {
-    if(astNode == NULL) {
-        return 0;
-    }
-
-    int leftDataType = 0;
-    int rightDataType = 0;
-    
-    if (astNode->type == AST_ADD 
-        || astNode->type == AST_SUB
-        || astNode->type == AST_MUL
-        || astNode->type == AST_DIV) {
-        leftDataType = getExpressionDataType(astNode->children[0]);
-        rightDataType = getExpressionDataType(astNode->children[1]);
-    }
-    
-    if (astNode->type == AST_SYMBOL
-        || astNode->type == AST_VEC
-        || astNode->type == AST_FUNC) {
-        return astNode->symbol->datatype;
-    }
-
-    // remove?
-    if (rightDataType == 0) {
-        rightDataType = leftDataType;
-    }
-
-    if (leftDataType != rightDataType) {
-        return 0;
-    }
-
-    return leftDataType;
 }
 
 // INT and CHAR are valid as numeric
@@ -366,16 +296,82 @@ void checkIdentifiers(ast_t *astNode) {
 }
 
 int isLiteral(ast_t *astNode) { // maybe wrong HERE
-    if (astNode->symbol->type == SYMBOL_VAR ||
-        astNode->symbol->type == SYMBOL_LIT_INT ||
-        astNode->symbol->type == SYMBOL_LIT_CHAR ||
-        astNode->symbol->type == SYMBOL_LIT_REAL ||
-        astNode->symbol->type == SYMBOL_LIT_FALSE ||
-        astNode->symbol->type == SYMBOL_LIT_TRUE ||
-        astNode->symbol->type == SYMBOL_FUNC) {
+    if (astNode->symbol->type == SYMBOL_VAR 
+        || astNode->symbol->type == SYMBOL_LIT_INT 
+        || astNode->symbol->type == SYMBOL_LIT_CHAR 
+        || astNode->symbol->type == SYMBOL_LIT_REAL 
+        || astNode->symbol->type == SYMBOL_LIT_FALSE 
+        || astNode->symbol->type == SYMBOL_LIT_TRUE 
+        || astNode->symbol->type == SYMBOL_FUNC) {
         return 1;
     }
     return 0;
+}
+
+void checkAssign(ast_t *astNode) {
+    if(astNode == NULL) {
+        return;
+    }
+
+    switch (astNode->type) {
+        case AST_ASSIGN:
+            if (astNode->symbol->datatype != getExpressionDataType(astNode->children[0])) {
+                if (isNumeric(astNode) && !isNumeric(astNode->children[0])) {    
+                    fprintf(stderr, "1Semantic ERROR: incompatible assign types.\n");
+                    semanticErrors++;
+                }
+            }
+            break;
+        case AST_VEC_ASSIGN:
+            if (astNode->children[0]->symbol->datatype != getExpressionDataType(astNode->children[1])) {
+                if ((isNumeric(astNode->children[0])) && !isNumeric(astNode->children[1])) {    
+                    fprintf(stderr, "2Semantic ERROR: incompatible assign types.\n");
+                    semanticErrors++;
+                }
+            }
+            break;
+    }
+
+    for (int i = 0; i < MAX_CHILDREN; i++) {
+        checkAssign(astNode->children[i]);
+    }
+    
+}
+
+// Returns 0 when expression doesnt have a datatype
+// Doesnt reconize Numeric expressions (INT whitch CHAR)
+int getExpressionDataType(ast_t *astNode) {
+    if(astNode == NULL) {
+        return 0;
+    }
+
+    int leftDataType = 0;
+    int rightDataType = 0;
+    
+    if (astNode->type == AST_ADD 
+        || astNode->type == AST_SUB
+        || astNode->type == AST_MUL
+        || astNode->type == AST_DIV) {
+        leftDataType = getExpressionDataType(astNode->children[0]);
+        rightDataType = getExpressionDataType(astNode->children[1]);
+    }
+    
+    if (astNode->type == AST_SYMBOL
+        || astNode->type == AST_VEC
+        || astNode->type == AST_FUNC) {
+        return astNode->symbol->datatype;
+    }
+
+    // remove?
+    if (rightDataType == 0) {
+        rightDataType = leftDataType;
+    }
+
+    if (leftDataType != rightDataType) {
+        return 0;
+    }
+
+    return leftDataType;
 }
 
 int getSemanticErrors() {

@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "y.tab.h": "c",
+        "stdlib.h": "c",
+        "hash_table.h": "c"
+    }
+}
