@@ -248,3 +248,42 @@ void astOutputRec(FILE *arq, ast_t *astNode) {
             break;
     }
 }
+
+void astPrintExpression(ast_t *astNode) {
+    if (astNode == NULL) {
+        return;
+    }
+
+    switch (astNode->type) {
+        case AST_SYMBOL:
+            fprintf(stderr, "%s", astNode->symbol->str);
+            break;
+        case AST_ADD:
+        case AST_SUB:
+        case AST_MUL:
+        case AST_DIV:
+        case AST_GT:
+        case AST_LT:
+        case AST_GE:
+        case AST_LE:
+        case AST_EQ:
+        case AST_DIF:
+        case AST_AND:
+        case AST_OR:
+        case AST_NOT:
+            if (astNode->symbol) {
+                fprintf(stderr, "%s", astNode->symbol->str);
+            } else {
+                astPrintExpression(astNode->children[0]);
+                fprintf(stderr, " %s ", AST_INFOS[astNode->type].expr); 
+                astPrintExpression(astNode->children[1]);
+            }
+            break;
+        case AST_VEC:
+            fprintf(stderr, "%s", astNode->symbol->str);
+            fprintf(stderr, "[");
+            astPrintExpression( astNode->children[0]);
+            fprintf(stderr, "]");
+            break;
+    }
+}

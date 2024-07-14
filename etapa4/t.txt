@@ -1,12 +1,16 @@
+int iv[5]: 'a' 1 2 'b';
 int ia: 1;
 int ib: 1;
 int ic: 1;
-int iv[10];
+
+bool kkkk[1]: true false;
 
 float fa: 1.1;
 float fb: 1.1;
 float fc: 1.1;
 float fv[11];
+
+bool ba: true;
 
 int ifun(){}
 float ffun(){}
@@ -17,17 +21,26 @@ int ires: 1;
 float fres: 1.1;
 
 int main() {
-  //fres = '1' + 2 + 3 + '4';
-  //ires = 1 + 2 > 3 + 4 + 5 + 6;
-  //fres = 1.1 + 2.2 + 3.3 + 4.1;
-  //fres = true & true;
-  //fres = 2 > 3;
-  //fres = true == true;
-  //fres = true | true;
-  //if (1 > 2 & 3 > 2);
-  //if (1 != 1 | 1 > 1);
-  //if (1 + 2 + 3 > (4 + 5) * 6 & 7 > 8 | 9 > 0);
-  //if (1 != 2 + 3 > (4 + 5) * 6 & 7 > 8 | 9 > 0);
+  /*
+  ires = '1' + 2 + 3 + '4';
+  ba = 1 + 2 > 3 + 4 + 5 + 6;
+  fres = 1.1 + 2.2 + 3.3 + 4.1;
+  ba = true & true;
+  ba = 2 > 3;
+  ba = true == true;
+  ba = true | true;
+  if (1 > 2 & 3 > 2);
+  if (1 != 1 | 1 > 1);
+  if (1 != 2 & 3 > (4 + 5) * 6 & 7 > 8 | 9 > 0);
+  ia = 'a' + 1;
+  ia = 'a' + 'b';
+  ia = 1 + ib + 3;
+  iv[1] = 'a' + 1;
+  fv[1] = 1.1 + 2.2;
+  ba = 1 != 2 & 3 > (4 + 5) * 6 & 7 > 8 | 9 > 0;
+  */
+
+  //if (1 != 2 + 3 > (4 + 5) * 6 & 7 > 8 | 9 > 0); // ERRO
   //ires = 1 + 2 > 3.1 + 4.1;           // Erro
   //ires = 'a' + 2 * 3 > 4 / 5 + 6 < 7; //Erro
   //fres = 1 & 1;                       // erro
@@ -35,5 +48,9 @@ int main() {
   //ia[0] = ia[1] + ia[0];
   //iv = iv + iv;
   //if (ia[1] + fv + ffun[1]);
-  //iv[1] = fa + 1 + 2;
+  //iv['a'] = iv[100] + iv[1] + iv[1 + 2] + iv[1 + 1 + 'a'];
+  //ires = 1;
+  //ires = iv[1 > 2];
+  //ires = 'a' + ires;
+
 }

@@ -91,7 +91,10 @@ void checkOperands(ast_t *astNode) {
         case AST_DIV:
             if (!isReal(astNode)) {
                 if (!isNumeric(astNode)) {
-                    fprintf(stderr, "1Semantic ERROR: invalid type for Arithmetic operator.\n");
+                    fprintf(stderr, "1Semantic ERROR: invalid type for Arithmetic operator.");
+                    fprintf(stderr, " (");
+                    astPrintExpression(astNode);
+                    fprintf(stderr, ")\n");
                     semanticErrors++;
                 } 
             }
@@ -142,9 +145,16 @@ int isNumeric(ast_t *astNode) {
         return 1;
     }
 
+    if (astNode->type == AST_LIT_LIST 
+        && isNumeric(astNode->children[0])) {
+        return 1;
+    }
+
     if (astNode->type == AST_SYMBOL
         || astNode->type == AST_VEC
-        || astNode->type == AST_FUNC) {
+        || astNode->type == AST_FUNC
+        || astNode->type == AST_ASSIGN
+        || astNode->type == AST_VAR_DEC) {
         if (astNode->symbol->datatype == DATATYPE_INT || astNode->symbol->datatype == DATATYPE_CHAR) {
             return 1;
         }
@@ -161,9 +171,16 @@ int isReal(ast_t *astNode) {
         return 1;
     }
 
+    if (astNode->type == AST_LIT_LIST 
+        && isReal(astNode->children[0])) {
+        return 1;
+    }
+
     if (astNode->type == AST_SYMBOL
         || astNode->type == AST_VEC
-        || astNode->type == AST_FUNC) {
+        || astNode->type == AST_FUNC
+        || astNode->type == AST_ASSIGN
+        || astNode->type == AST_VAR_DEC) {
         if (astNode->symbol->datatype == DATATYPE_FLOAT) {
             return 1;
         }
@@ -192,9 +209,16 @@ int isBoolean(ast_t *astNode) {
         return 1;
     }
 
+    if (astNode->type == AST_LIT_LIST 
+        && isBoolean(astNode->children[0])) {
+        return 1;
+    }
+
     if (astNode->type == AST_SYMBOL
         || astNode->type == AST_VEC
-        || astNode->type == AST_FUNC) {
+        || astNode->type == AST_FUNC
+        || astNode->type == AST_ASSIGN
+        || astNode->type == AST_VAR_DEC) {
         if (astNode->symbol->datatype == DATATYPE_BOOL) {
             return 1;
         }
@@ -315,19 +339,48 @@ void checkAssign(ast_t *astNode) {
 
     switch (astNode->type) {
         case AST_ASSIGN:
-            if (astNode->symbol->datatype != getExpressionDataType(astNode->children[0])) {
-                if (isNumeric(astNode) && !isNumeric(astNode->children[0])) {    
-                    fprintf(stderr, "1Semantic ERROR: incompatible assign types.\n");
-                    semanticErrors++;
-                }
+            if (!(isBoolean(astNode) && isBoolean(astNode->children[0]))) {   
+                if (!(isNumeric(astNode) && isNumeric(astNode->children[0]))) {    
+                    if (!(isReal(astNode) && isReal(astNode->children[0]))) {
+                        fprintf(stderr, "1Semantic ERROR: incompatible assign types.\n");
+                        semanticErrors++;
+                    }
+                }   
             }
             break;
         case AST_VEC_ASSIGN:
-            if (astNode->children[0]->symbol->datatype != getExpressionDataType(astNode->children[1])) {
-                if ((isNumeric(astNode->children[0])) && !isNumeric(astNode->children[1])) {    
-                    fprintf(stderr, "2Semantic ERROR: incompatible assign types.\n");
-                    semanticErrors++;
+            if (!(isBoolean(astNode->children[0]) && isBoolean(astNode->children[1]))) {
+                if (!(isNumeric(astNode->children[0]) && isNumeric(astNode->children[1]))) {    
+                    if (!(isReal(astNode->children[0]) && isReal(astNode->children[1]))) {    
+                        fprintf(stderr, "2Semantic ERROR: incompatible assign types.\n");
+                        semanticErrors++;
+                    }
                 }
+            }
+            break;
+        // Declarations assign
+        case AST_VAR_DEC:
+            if (!(isBoolean(astNode) && isBoolean(astNode->children[1]))) {
+                if (!(isNumeric(astNode) && isNumeric(astNode->children[1]))) {
+                    if (!(isReal(astNode) && isReal(astNode->children[1]))) {
+                        fprintf(stderr, "3Semantic ERROR: incompatible type in declaration.\n");
+                        semanticErrors++;
+                    }
+                }
+            }
+            break;
+        case AST_VEC_DEC:
+            if (astNode->children[2]) { // with list
+                if (!(isBoolean(astNode->children[1]) && isBoolean(astNode->children[2]))) {
+                    if (!(isNumeric(astNode->children[1]) && isNumeric(astNode->children[2]))) {
+                        if (!(isReal(astNode->children[1]) && isReal(astNode->children[2]))) {
+                            fprintf(stderr, "4Semantic ERROR: incompatible type in declaration.\n");
+                            semanticErrors++;
+                        }
+                    }
+                }
+            } else {
+
             }
             break;
     }
@@ -340,6 +393,7 @@ void checkAssign(ast_t *astNode) {
 
 // Returns 0 when expression doesnt have a datatype
 // Doesnt reconize Numeric expressions (INT whitch CHAR)
+// USELESS HERE
 int getExpressionDataType(ast_t *astNode) {
     if(astNode == NULL) {
         return 0;
@@ -374,6 +428,25 @@ int getExpressionDataType(ast_t *astNode) {
     return leftDataType;
 }
 
+void checkVector(ast_t *astNode) {
+    if(astNode == NULL) {
+        return;
+    }
+
+    switch (astNode->type) {
+        case AST_VEC:
+            if (!isNumeric(astNode->children[0])) {
+                fprintf(stderr, "Semantic ERROR: invalid type for array index.\n");
+                semanticErrors++;
+            }
+            break;
+    }
+
+    for (int i = 0; i < MAX_CHILDREN; i++) {
+        checkVector(astNode->children[i]);
+    }
+}
+
 int getSemanticErrors() {
     return semanticErrors;
 }
@@ -384,4 +457,5 @@ void checkSemantic(ast_t *astNode, hash_t *hashNode[]) {
     checkOperands(astNode);
     checkIdentifiers(astNode);
     checkAssign(astNode);
+    checkVector(astNode);
 }

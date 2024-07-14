@@ -113,5 +113,6 @@ ast_t *astCreate(int type, hash_t *symbol, ast_t *c0, ast_t *c1, ast_t *c2, ast_
 void astPrint(ast_t *astNode, int level);
 void astOutput(ast_t *astNode);
 void astOutputRec(FILE *arq, ast_t *astNode);
+void astPrintExpression(ast_t *astNode);
 
 #endif // AST_HEADER
