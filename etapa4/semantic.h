@@ -26,6 +26,7 @@ void checkAssign(ast_t *astNode);
 void checkVector(ast_t *astNode);
 
 int getExpressionDataType(ast_t *astNode);
+int getLitListSize(ast_t *astNode);
 
 int isNumeric(ast_t *astNode);
 int isReal(ast_t *astNode);

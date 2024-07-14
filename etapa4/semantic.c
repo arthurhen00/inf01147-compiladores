@@ -1,4 +1,5 @@
 #include "semantic.h"
+#include "stdlib.h"
 
 int semanticErrors = 0;
 
@@ -128,6 +129,12 @@ void checkOperands(ast_t *astNode) {
                 fprintf(stderr, "4Semantic ERROR: invalid type for operator.\n");
                 semanticErrors++;    
             }
+            break;
+        case AST_PRINT:
+
+            break;
+        case AST_READ:
+
             break;
     }
 
@@ -379,8 +386,11 @@ void checkAssign(ast_t *astNode) {
                         }
                     }
                 }
-            } else {
 
+                if (atoi(astNode->children[1]->children[0]->symbol->str) != getLitListSize(astNode->children[2])) {
+                    fprintf(stderr, "5Semantic ERROR: incorrect use of vector size.\n");
+                    semanticErrors++;
+                }
             }
             break;
     }
@@ -445,6 +455,14 @@ void checkVector(ast_t *astNode) {
     for (int i = 0; i < MAX_CHILDREN; i++) {
         checkVector(astNode->children[i]);
     }
+}
+
+int getLitListSize(ast_t *astNode) {
+    if (astNode->type == AST_SYMBOL) {
+        return 1;
+    }
+
+    return 1 + getLitListSize(astNode->children[0]);
 }
 
 int getSemanticErrors() {

@@ -1,9 +1,9 @@
-int iv[5]: 'a' 1 2 'b';
+int iv[5]: 'a' 1 2 'b' 2;
 int ia: 1;
 int ib: 1;
 int ic: 1;
 
-bool kkkk[1]: true false;
+bool kkkk[1]: true;
 
 float fa: 1.1;
 float fb: 1.1;

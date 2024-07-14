@@ -53,7 +53,8 @@
 %type<symbol> literal
 %type<ast> type expr arr_call func_call cmd cmd_list block dec decl list_literal arg_dec func_dec arg arg_list call_args_list
 
-%left '&' '|' 
+%left '|' 
+%left '&' 
 %left '<' '>' OPERATOR_DIF OPERATOR_EQ OPERATOR_GE OPERATOR_LE '~'
 %left '+' '-'
 %left '*' '/'
