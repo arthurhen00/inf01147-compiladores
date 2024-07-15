@@ -7,3 +7,6 @@
         ou
         == != com tipos BOOLEAN NUMERIC ou REAL equality
     */
+
+    // TIPO DEC vetor
+    // funcao args

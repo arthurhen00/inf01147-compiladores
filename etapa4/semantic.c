@@ -9,7 +9,8 @@ void checkAndSetDeclarations(ast_t *astNode) {
     }
 
     switch (astNode->type) {
-        case AST_VAR_DEC: 
+        case AST_VAR_DEC:
+        case AST_ARG:
             if (astNode->symbol->type != SYMBOL_IDENTIFIER) {
                 semanticErrors++;
                 fprintf(stderr, "Semantic ERROR: Variable '%s' already declared.\n", astNode->symbol->str);
@@ -24,6 +25,8 @@ void checkAndSetDeclarations(ast_t *astNode) {
             }
             astNode->children[1]->symbol->type = SYMBOL_VEC;
             astNode->children[1]->symbol->datatype = inferDataType2(astNode);
+            // Hash points to AST
+            astNode->children[1]->symbol->ast = astNode;
             break;
         case AST_FUNC_DEC:
             if (astNode->symbol->type != SYMBOL_IDENTIFIER) {
@@ -32,12 +35,16 @@ void checkAndSetDeclarations(ast_t *astNode) {
             }
             astNode->symbol->type = SYMBOL_FUNC;
             astNode->symbol->datatype = inferDataType2(astNode);
+            // Hash points to AST
+            astNode->symbol->ast = astNode;
             break;
         // They are not declarations, but they need a datatype.
         case AST_SYMBOL:
+        case AST_LIT_LIST:
             if (!astNode->symbol->datatype) {
                 astNode->symbol->datatype = inferDataTypeFromType(astNode->symbol->type);
             }
+            if (astNode->type == AST_LIT_LIST)
             break;
     }
 
@@ -175,6 +182,23 @@ void checkOperands(ast_t *astNode) {
                 }
             }
             break;
+        case AST_FUNC_DEC:
+            checkFunctionReturnType(astNode->children[1], nodesDataType[astNode->children[0]->type]);
+            break;
+        case AST_FUNC:
+            int argsDecSize = 0;
+            int argsCallSize = 0;
+            if (astNode->children[0]) {
+                argsCallSize = getCArgsListSize(astNode->children[0]);
+            }
+            if (astNode->symbol->ast->children[1]->type == AST_ARG_LIST) {
+                argsDecSize = getCArgsListSize(astNode->symbol->ast->children[1]);
+            }
+                if (argsCallSize != argsDecSize) {
+                    fprintf(stderr, "Semantic ERROR: expected '%d' arguments but received '%d'.\n", argsDecSize, argsCallSize);
+                    semanticErrors++;
+                }
+            break;
     }
 
     for (int i = 0; i < MAX_CHILDREN; i++) {
@@ -192,7 +216,8 @@ int isNumeric(ast_t *astNode) {
     }
 
     if (astNode->type == AST_LIT_LIST 
-        && isNumeric(astNode->children[0])) {
+        && isNumeric(astNode->children[0])
+        && (astNode->symbol->datatype == DATATYPE_INT || astNode->symbol->datatype == DATATYPE_CHAR)) {
         return 1;
     }
 
@@ -219,7 +244,8 @@ int isReal(ast_t *astNode) {
     }
 
     if (astNode->type == AST_LIT_LIST 
-        && isReal(astNode->children[0])) {
+        && isReal(astNode->children[0])
+        && astNode->symbol->datatype == DATATYPE_FLOAT) {
         return 1;
     }
 
@@ -258,7 +284,8 @@ int isBoolean(ast_t *astNode) {
     }
 
     if (astNode->type == AST_LIT_LIST 
-        && isBoolean(astNode->children[0])) {
+        && isBoolean(astNode->children[0])
+        && astNode->symbol->datatype == DATATYPE_BOOL) {
         return 1;
     }
 
@@ -421,12 +448,21 @@ void checkAssign(ast_t *astNode) {
             break;
         case AST_VEC_DEC:
             if (astNode->children[2]) { // with list
-                if (!(isBoolean(astNode->children[1]) && isBoolean(astNode->children[2]))) {
-                    if (!(isNumeric(astNode->children[1]) && isNumeric(astNode->children[2]))) {
-                        if (!(isReal(astNode->children[1]) && isReal(astNode->children[2]))) {
-                            fprintf(stderr, "4Semantic ERROR: incompatible type in declaration.\n");
-                            semanticErrors++;
-                        }
+                if (nodesDataType[astNode->children[0]->type] == DATATYPE_BOOL) {
+                    if (!isBoolean(astNode->children[2])) {
+                        fprintf(stderr, "4.1Semantic ERROR: incompatible type in declaration.\n");
+                        semanticErrors++;
+                    }
+                } else if (nodesDataType[astNode->children[0]->type] == DATATYPE_FLOAT) {
+                    if (!isReal(astNode->children[2])) {
+                        fprintf(stderr, "4.2Semantic ERROR: incompatible type in declaration.\n");
+                        semanticErrors++;
+                    }
+                } if (nodesDataType[astNode->children[0]->type] == DATATYPE_INT
+                        || nodesDataType[astNode->children[0]->type] == DATATYPE_CHAR) {
+                    if (!isNumeric(astNode->children[2])) {
+                        fprintf(stderr, "4.3Semantic ERROR: incompatible type in declaration.\n");
+                        semanticErrors++;
                     }
                 }
 
@@ -444,55 +480,25 @@ void checkAssign(ast_t *astNode) {
     
 }
 
-// Returns 0 when expression doesnt have a datatype
-// Doesnt reconize Numeric expressions (INT whitch CHAR)
-// USELESS HERE
-int getExpressionDataType(ast_t *astNode) {
-    if(astNode == NULL) {
-        return 0;
-    }
-
-    int leftDataType = 0;
-    int rightDataType = 0;
-    
-    if (astNode->type == AST_ADD 
-        || astNode->type == AST_SUB
-        || astNode->type == AST_MUL
-        || astNode->type == AST_DIV) {
-        leftDataType = getExpressionDataType(astNode->children[0]);
-        rightDataType = getExpressionDataType(astNode->children[1]);
-    }
-    
-    if (astNode->type == AST_SYMBOL
-        || astNode->type == AST_VEC
-        || astNode->type == AST_FUNC) {
-        return astNode->symbol->datatype;
-    }
-
-    // remove?
-    if (rightDataType == 0) {
-        rightDataType = leftDataType;
-    }
-
-    if (leftDataType != rightDataType) {
-        return 0;
-    }
-
-    return leftDataType;
-}
-
 void checkVector(ast_t *astNode) {
-    if(astNode == NULL) {
+    if (astNode == NULL) {
         return;
     }
 
     switch (astNode->type) {
         case AST_VEC:
-            if (!isNumeric(astNode->children[0])) {
-                fprintf(stderr, "Semantic ERROR: invalid type for array index.\n");
-                semanticErrors++;
+            if (astNode->symbol->type == SYMBOL_VEC) {
+                if (!isNumeric(astNode->children[0])) {
+                    fprintf(stderr, "Semantic ERROR: invalid type for array index.\n");
+                    semanticErrors++;
+                }
+                if (atoi(astNode->children[0]->symbol->str) 
+                    > atoi(astNode->symbol->ast->children[1]->children[0]->symbol->str)) {
+                    fprintf(stderr, "Semantic ERROR: index out of bounds.\n");
+                    semanticErrors++;
+                }
+                break;
             }
-            break;
     }
 
     for (int i = 0; i < MAX_CHILDREN; i++) {
@@ -506,6 +512,50 @@ int getLitListSize(ast_t *astNode) {
     }
 
     return 1 + getLitListSize(astNode->children[0]);
+}
+
+int getCArgsListSize(ast_t *astNode) {
+    if (astNode->type == AST_CARGS_LIST && astNode->children[1] == NULL) {
+       return 1;
+    }
+
+    if (astNode->type == AST_ARG_LIST && astNode->children[1] == NULL) {
+       return 1;
+    }
+
+    return 1 + getCArgsListSize(astNode->children[1]);
+}
+
+void checkFunctionReturnType(ast_t *astNode, int type) {
+    if(astNode == NULL) {
+        return;
+    }
+
+    if (astNode->type == AST_RETURN) {
+        if (type == DATATYPE_INT || type == DATATYPE_CHAR) {
+            if (!isNumeric(astNode->children[0])) {
+                fprintf(stderr, "Semantic ERROR: return must be a numeric type.\n");
+                semanticErrors++;
+                return;
+            }
+        } else if (type == DATATYPE_FLOAT) {
+            if (!isReal(astNode->children[0])) {
+                fprintf(stderr, "Semantic ERROR: return must be a real type.\n");
+                semanticErrors++;
+                return;
+            }
+        } else if (type == DATATYPE_BOOL) {
+            if (!isBoolean(astNode->children[0])) {
+                fprintf(stderr, "Semantic ERROR: return must be a boolean type.\n");
+                semanticErrors++;
+                return;
+            }
+        }
+    }
+
+    for (int i = 0; i < MAX_CHILDREN; i++) {
+        checkFunctionReturnType(astNode->children[i], type);
+    }
 }
 
 int getSemanticErrors() {

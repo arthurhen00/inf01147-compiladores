@@ -12,8 +12,8 @@ float fv[11];
 
 bool ba: true;
 
-int ifun(){}
-float ffun(){}
+//int ifun(){}
+//float ffun(){}
 
 char ca[3]: 'a' '2' 'a';
 
@@ -21,7 +21,7 @@ int ires: 1;
 float fres: 1.1;
 
 int main() {
-  
+  /*
   ires = '1' + 2 + 3 + '4';
   ba = 1 + 2 > 3 + 4 + 5 + 6;
   fres = 1.1 + 2.2 + 3.3 + 4.1;
@@ -41,7 +41,7 @@ int main() {
   print float fa;
   print bool 1 > 2;
   print "carro";
-  
+  */
   //if (1 != 2 + 3 > (4 + 5) * 6 & 7 > 8 | 9 > 0); // ERRO
   //res = 1 + 2 > 3.1 + 4.1;           // Erro
   //res = 'a' + 2 * 3 > 4 / 5 + 6 < 7; //Erro
@@ -54,4 +54,9 @@ int main() {
   //ires = 1;
   //ires = iv[1 > 2];
   //ires = 'a' + ires;
+  fres = funcao();
+}
+
+float funcao(int x, int y) {
+
 }

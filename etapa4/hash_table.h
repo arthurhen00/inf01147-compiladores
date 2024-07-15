@@ -48,6 +48,7 @@ typedef struct hashNode {
     int type;
     int datatype;
     struct hashNode *next;
+    struct astNode *ast;
 } hash_t;
 
 void hashInit(hash_t *table[]);

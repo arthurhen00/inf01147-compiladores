@@ -25,8 +25,9 @@ void checkIdentifiers(ast_t *astNode);
 void checkAssign(ast_t *astNode);
 void checkVector(ast_t *astNode);
 
-int getExpressionDataType(ast_t *astNode);
 int getLitListSize(ast_t *astNode);
+int getCArgsListSize(ast_t *astNode);
+void checkFunctionReturnType(ast_t *astNode, int type);
 
 int isNumeric(ast_t *astNode);
 int isReal(ast_t *astNode);
