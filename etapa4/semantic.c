@@ -186,18 +186,20 @@ void checkOperands(ast_t *astNode) {
             checkFunctionReturnType(astNode->children[1], nodesDataType[astNode->children[0]->type]);
             break;
         case AST_FUNC:
-            int argsDecSize = 0;
-            int argsCallSize = 0;
-            if (astNode->children[0]) {
-                argsCallSize = getCArgsListSize(astNode->children[0]);
-            }
-            if (astNode->symbol->ast->children[1]->type == AST_ARG_LIST) {
-                argsDecSize = getCArgsListSize(astNode->symbol->ast->children[1]);
-            }
+            if (astNode->symbol->type == SYMBOL_FUNC) {
+                int argsDecSize = 0;
+                int argsCallSize = 0;
+                if (astNode->children[0]) {
+                    argsCallSize = getCArgsListSize(astNode->children[0]);
+                }
+                if (astNode->symbol->ast->children[1]->type == AST_ARG_LIST) {
+                    argsDecSize = getCArgsListSize(astNode->symbol->ast->children[1]);
+                }
                 if (argsCallSize != argsDecSize) {
                     fprintf(stderr, "Semantic ERROR: expected '%d' arguments but received '%d'.\n", argsDecSize, argsCallSize);
                     semanticErrors++;
                 }
+            }
             break;
     }
 
