@@ -198,6 +198,37 @@ void checkOperands(ast_t *astNode) {
                 if (argsCallSize != argsDecSize) {
                     fprintf(stderr, "Semantic ERROR: expected '%d' arguments but received '%d'.\n", argsDecSize, argsCallSize);
                     semanticErrors++;
+                } else {
+                    // Check if types are equal
+                    ast_t *nodeAux = astNode->symbol->ast->children[1]; // AST_ARG_LIST
+                    ast_t *nodeAux2 = astNode->children[0]; // AST_CARG_LIST
+                    for (int i = 0; i < argsCallSize; i++) {
+                        if (isNumeric(nodeAux->children[0])) {
+                            if (!isNumeric(nodeAux2->children[0])) {
+                                fprintf(stderr, "Semantic ERROR: '%d' arg must be a numeric type.\n", i + 1);
+                                semanticErrors++;
+                            }
+                        }
+                        if (isReal(nodeAux->children[0])) {
+                            if (!isReal(nodeAux2->children[0])) {
+                                fprintf(stderr, "Semantic ERROR: '%d' arg must be a real type.\n", i + 1);
+                                semanticErrors++;
+                            }
+                        }
+                        if (isBoolean(nodeAux->children[0])) {
+                            if (!isBoolean(nodeAux2->children[0])) {
+                                fprintf(stderr, "Semantic ERROR: '%d' arg must be a boolean type.\n", i + 1);
+                                semanticErrors++;
+                            }
+                        }
+
+                        if (nodeAux->children[1]) {
+                            nodeAux = nodeAux->children[1];
+                        }
+                        if (nodeAux2->children[1]) {
+                            nodeAux2 = nodeAux2->children[1];
+                        }
+                    }
                 }
             }
             break;
@@ -228,7 +259,8 @@ int isNumeric(ast_t *astNode) {
         || astNode->type == AST_FUNC
         || astNode->type == AST_ASSIGN
         || astNode->type == AST_VAR_DEC
-        || astNode->type == AST_READ) {
+        || astNode->type == AST_READ
+        || astNode->type == AST_ARG) {
         if (astNode->symbol->datatype == DATATYPE_INT || astNode->symbol->datatype == DATATYPE_CHAR) {
             return 1;
         }
@@ -256,7 +288,8 @@ int isReal(ast_t *astNode) {
         || astNode->type == AST_FUNC
         || astNode->type == AST_ASSIGN
         || astNode->type == AST_VAR_DEC
-        || astNode->type == AST_READ) {
+        || astNode->type == AST_READ
+        || astNode->type == AST_ARG) {
         if (astNode->symbol->datatype == DATATYPE_FLOAT) {
             return 1;
         }
@@ -296,7 +329,8 @@ int isBoolean(ast_t *astNode) {
         || astNode->type == AST_FUNC
         || astNode->type == AST_ASSIGN
         || astNode->type == AST_VAR_DEC
-        || astNode->type == AST_READ) {
+        || astNode->type == AST_READ
+        || astNode->type == AST_ARG) {
         if (astNode->symbol->datatype == DATATYPE_BOOL) {
             return 1;
         }
