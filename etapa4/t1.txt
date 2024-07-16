@@ -1,11 +1,5 @@
-int fun(int x, float y, bool z, char w){}
-int a: 1;
-float b: 1.1;
-bool c: true;
-char d: 'a';
-
-int ivec[5]: 1 2 3 4 1;
+int v[5]: 1 2 3 4 1;
 
 int main() {
-    a = fun(a,a,a,a);
+    v[4] = 1;
 }

@@ -532,8 +532,9 @@ void checkVector(ast_t *astNode) {
                     fprintf(stderr, "Semantic ERROR: invalid type for array index.\n");
                     semanticErrors++;
                 }
-                if (atoi(astNode->children[0]->symbol->str) 
-                    > atoi(astNode->symbol->ast->children[1]->children[0]->symbol->str)) {
+                if ((atoi(astNode->children[0]->symbol->str)  
+                    > atoi(astNode->symbol->ast->children[1]->children[0]->symbol->str) - 1)
+                        && astNode->symbol->ast->children[1] != astNode) { // O filho do meu pai nao deve ser eu
                     fprintf(stderr, "Semantic ERROR: index out of bounds.\n");
                     semanticErrors++;
                 }
