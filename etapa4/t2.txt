@@ -40,7 +40,7 @@ int main ()
    a = double(3.3); //ERRO tipo arg errado
    a = double(3, 4.2); //ERRO tipo arg errado
    a = double(3 , 3); //ERRO mto param
-  return 1.1; //ERRO tipo errado
+    return 1.1; //ERRO tipo errado
   }
 
 char double(int x){

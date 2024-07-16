@@ -183,7 +183,11 @@ void checkOperands(ast_t *astNode) {
             }
             break;
         case AST_FUNC_DEC:
-            checkFunctionReturnType(astNode->children[1], nodesDataType[astNode->children[0]->type]);
+            if (astNode->children[1]->type == AST_BLOCK) {
+                checkFunctionReturnType(astNode->children[1], nodesDataType[astNode->children[0]->type]);
+            } else {
+                checkFunctionReturnType(astNode->children[2], nodesDataType[astNode->children[0]->type]);
+            }
             break;
         case AST_FUNC:
             if (astNode->symbol->type == SYMBOL_FUNC) {
@@ -205,19 +209,19 @@ void checkOperands(ast_t *astNode) {
                     for (int i = 0; i < argsCallSize; i++) {
                         if (isNumeric(nodeAux->children[0])) {
                             if (!isNumeric(nodeAux2->children[0])) {
-                                fprintf(stderr, "Semantic ERROR: '%d' arg must be a numeric type.\n", i + 1);
+                                fprintf(stderr, "Semantic ERROR: %d° arg in function '%s' must be a numeric type.\n", i + 1, astNode->symbol->str);
                                 semanticErrors++;
                             }
                         }
                         if (isReal(nodeAux->children[0])) {
                             if (!isReal(nodeAux2->children[0])) {
-                                fprintf(stderr, "Semantic ERROR: '%d' arg must be a real type.\n", i + 1);
+                                fprintf(stderr, "Semantic ERROR: %d° arg in function '%s' must be a real type.\n", i + 1, astNode->symbol->str);
                                 semanticErrors++;
                             }
                         }
                         if (isBoolean(nodeAux->children[0])) {
                             if (!isBoolean(nodeAux2->children[0])) {
-                                fprintf(stderr, "Semantic ERROR: '%d' arg must be a boolean type.\n", i + 1);
+                                fprintf(stderr, "Semantic ERROR: %d° arg in function '%s' must be a boolean type.\n", i + 1, astNode->symbol->str);
                                 semanticErrors++;
                             }
                         }

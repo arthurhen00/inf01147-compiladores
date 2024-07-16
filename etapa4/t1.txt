@@ -4,6 +4,8 @@ float b: 1.1;
 bool c: true;
 char d: 'a';
 
+int ivec[5]: 1 2 3 4 1;
+
 int main() {
     a = fun(a,a,a,a);
 }
