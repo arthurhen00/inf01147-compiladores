@@ -27,6 +27,7 @@ void checkVector(ast_t *astNode);
 
 int getLitListSize(ast_t *astNode);
 int getCArgsListSize(ast_t *astNode);
+int getExprRes(ast_t *astNode);
 void checkFunctionReturnType(ast_t *astNode, int type);
 
 int isNumeric(ast_t *astNode);

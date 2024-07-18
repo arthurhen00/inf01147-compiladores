@@ -16,9 +16,7 @@ void checkAndSetDeclarations(ast_t *astNode) {
                 fprintf(stderr, "Semantic ERROR: Variable '%s' already declared.\n", astNode->symbol->str);
             }
             astNode->symbol->type = SYMBOL_VAR;
-            astNode->symbol->datatype = inferDataType2(astNode);
-            break;
-        case AST_VEC_DEC:
+            astNode->symbol->datatype = inferDataType2(astNode); break; case AST_VEC_DEC:
             if (astNode->children[1]->symbol->type != SYMBOL_IDENTIFIER) {
                 semanticErrors++;
                 fprintf(stderr, "Semantic ERROR: Vector '%s' already declared.\n", astNode->children[1]->symbol->str);
@@ -532,11 +530,27 @@ void checkVector(ast_t *astNode) {
                     fprintf(stderr, "Semantic ERROR: invalid type for array index.\n");
                     semanticErrors++;
                 }
-                if ((atoi(astNode->children[0]->symbol->str)  
-                    > atoi(astNode->symbol->ast->children[1]->children[0]->symbol->str) - 1)
-                        && astNode->symbol->ast->children[1] != astNode) { // O filho do meu pai nao deve ser eu
-                    fprintf(stderr, "Semantic ERROR: index out of bounds.\n");
-                    semanticErrors++;
+                if (astNode->children[0]->type != AST_SYMBOL) {
+                    if (!isNumeric(astNode->children[0])) {
+                        fprintf(stderr, "Semantic ERROR: invalid type for array index.\n");
+                        semanticErrors++;
+                    } else {
+                        // when index is an expression
+                        fprintf(stderr, "res:%d\n",getExprRes(astNode->children[0]));
+                        if ((getExprRes(astNode->children[0])  
+                            > atoi(astNode->symbol->ast->children[1]->children[0]->symbol->str) - 1)
+                                && astNode->symbol->ast->children[1] != astNode) { // O filho do meu pai nao deve ser eu
+                            fprintf(stderr, "Semantic ERROR: index out of bounds in Arith.\n");
+                            semanticErrors++;
+                        }
+                    }
+                } else {
+                    if ((atoi(astNode->children[0]->symbol->str)  
+                        > atoi(astNode->symbol->ast->children[1]->children[0]->symbol->str) - 1)
+                            && astNode->symbol->ast->children[1] != astNode) { // O filho do meu pai nao deve ser eu
+                        fprintf(stderr, "Semantic ERROR: index out of bounds.\n");
+                        semanticErrors++;
+                    }
                 }
                 break;
             }
@@ -546,6 +560,41 @@ void checkVector(ast_t *astNode) {
         checkVector(astNode->children[i]);
     }
 }
+
+int getExprRes(ast_t *astNode) {
+    if (astNode->type == AST_ADD) {
+        return getExprRes(astNode->children[0]) + getExprRes(astNode->children[1]);
+    }
+    if (astNode->type == AST_SUB) {
+        return getExprRes(astNode->children[0]) - getExprRes(astNode->children[1]);
+    }
+    if (astNode->type == AST_MUL) {
+        return getExprRes(astNode->children[0]) * getExprRes(astNode->children[1]);
+    }
+    if (astNode->type == AST_DIV) {
+        return getExprRes(astNode->children[0]) / getExprRes(astNode->children[1]);
+    }
+
+    return atoi(astNode->symbol->str);
+}
+/*
+int getExprRes(ast_t *astNode) {
+    if ( astNode->type == AST_ADD ) {
+        return atoi(astNode->children[1]->symbol->str) + getExprRes(astNode->children[0]);
+    }
+    if ( astNode->type == AST_SUB ) {
+        return atoi(astNode->children[1]->symbol->str) - getExprRes(astNode->children[0]);
+    }
+    if ( astNode->type == AST_MUL ) {
+        return atoi(astNode->children[1]->symbol->str) * getExprRes(astNode->children[0]);
+    }
+    if ( astNode->type == AST_DIV ) {
+        return atoi(astNode->children[1]->symbol->str) / getExprRes(astNode->children[0]);
+    }
+
+    return atoi(astNode->symbol->str); 
+}
+*/
 
 int getLitListSize(ast_t *astNode) {
     if (astNode->type == AST_SYMBOL) {
