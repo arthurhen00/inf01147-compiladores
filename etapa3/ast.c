@@ -243,6 +243,11 @@ void astOutputRec(FILE *arq, ast_t *astNode) {
                 astOutputRec(arq, astNode->children[0]);
             }
             break;
+        case AST_OPEN_BR:
+            fprintf(arq, "(");
+            astOutputRec(arq, astNode->children[0]);
+            fprintf(arq, ")");
+            break;
         default:
             fprintf(arq, "AST_UNKNOWN");
             break;

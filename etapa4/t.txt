@@ -54,7 +54,7 @@ int main() {
   //ires = 1;
   //ires = iv[1 > 2];
   //ires = 'a' + ires;
-  fres = funcao();
+  fres = funcao(ia, ib);
 }
 
 float funcao(int x, int y) {

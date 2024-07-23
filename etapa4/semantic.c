@@ -249,6 +249,11 @@ int isNumeric(ast_t *astNode) {
         && isNumeric(astNode->children[1])) {
         return 1;
     }
+    
+    if (astNode->type == AST_OPEN_BR
+        && isNumeric(astNode->children[0])) {
+    	return 1;
+    }
 
     if (astNode->type == AST_LIT_LIST 
         && isNumeric(astNode->children[0])
@@ -278,6 +283,11 @@ int isReal(ast_t *astNode) {
         && isReal(astNode->children[1])) {
         return 1;
     }
+    
+    if (astNode->type == AST_OPEN_BR
+        && isReal(astNode->children[0])) {
+    	return 1;
+    }
 
     if (astNode->type == AST_LIT_LIST 
         && isReal(astNode->children[0])
@@ -306,6 +316,11 @@ int isBoolean(ast_t *astNode) {
         && ((isNumeric(astNode->children[0]) && isNumeric(astNode->children[1]))
             || (isReal(astNode->children[0]) && isReal(astNode->children[1])))) {
         return 1;
+    }
+    
+    if (astNode->type == AST_OPEN_BR
+        && isBoolean(astNode->children[0])) {
+    	return 1;
     }
 
     if (isLogicalOp(astNode)
@@ -531,13 +546,14 @@ void checkVector(ast_t *astNode) {
                     semanticErrors++;
                 }
                 if (astNode->children[0]->type != AST_SYMBOL) {
+                    // somar expr se for int char
                     if (!isNumeric(astNode->children[0])) {
                         fprintf(stderr, "Semantic ERROR: invalid type for array index.\n");
                         semanticErrors++;
                     } else {
-                        // when index is an expression
-                        fprintf(stderr, "res:%d\n",getExprRes(astNode->children[0]));
-                        if ((getExprRes(astNode->children[0])  
+                        // soma
+                        fprintf(stderr, "Soma: %d\n", getExprRes(astNode->children[0]));
+                        if (( getExprRes(astNode->children[0])  
                             > atoi(astNode->symbol->ast->children[1]->children[0]->symbol->str) - 1)
                                 && astNode->symbol->ast->children[1] != astNode) { // O filho do meu pai nao deve ser eu
                             fprintf(stderr, "Semantic ERROR: index out of bounds in Arith.\n");
@@ -575,26 +591,13 @@ int getExprRes(ast_t *astNode) {
         return getExprRes(astNode->children[0]) / getExprRes(astNode->children[1]);
     }
 
-    return atoi(astNode->symbol->str);
-}
-/*
-int getExprRes(ast_t *astNode) {
-    if ( astNode->type == AST_ADD ) {
-        return atoi(astNode->children[1]->symbol->str) + getExprRes(astNode->children[0]);
-    }
-    if ( astNode->type == AST_SUB ) {
-        return atoi(astNode->children[1]->symbol->str) - getExprRes(astNode->children[0]);
-    }
-    if ( astNode->type == AST_MUL ) {
-        return atoi(astNode->children[1]->symbol->str) * getExprRes(astNode->children[0]);
-    }
-    if ( astNode->type == AST_DIV ) {
-        return atoi(astNode->children[1]->symbol->str) / getExprRes(astNode->children[0]);
+    if (astNode->type == AST_OPEN_BR) {
+        return getExprRes(astNode->children[0]);
     }
 
-    return atoi(astNode->symbol->str); 
+    return atoi(astNode->symbol->str);
 }
-*/
+    
 
 int getLitListSize(ast_t *astNode) {
     if (astNode->type == AST_SYMBOL) {

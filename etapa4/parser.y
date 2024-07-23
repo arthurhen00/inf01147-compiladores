@@ -146,7 +146,7 @@ expr: literal                { $$ = astCreate(AST_SYMBOL, $1  , NULL, NULL, NULL
     | expr '&' expr          { $$ = astCreate(AST_AND   , NULL, $1  , $3  , NULL, NULL); }
     | expr '|' expr          { $$ = astCreate(AST_OR    , NULL, $1  , $3  , NULL, NULL); }
     | expr '~' expr          { $$ = astCreate(AST_NOT   , NULL, $1  , $3  , NULL, NULL); }
-    | '(' expr ')'           { $$ = $2; }
+    | '(' expr ')'           { $$ = astCreate(AST_OPEN_BR,NULL, $2  , NULL, NULL, NULL); }
     ;
 
 %%

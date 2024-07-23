@@ -47,6 +47,8 @@
 #define AST_ARG        38
 #define AST_FUNC       39
 #define AST_CARGS_LIST 40
+#define AST_OPEN_BR    41
+#define AST_CLOSE_BR   42
 
 #include "hash_table.h"
 
@@ -106,6 +108,8 @@ const static astinfos_t AST_INFOS[] = {
     { AST_ARG       , "AST_ARG"       , NULL    },
     { AST_FUNC      , "AST_FUNC"      , NULL    },
     { AST_CARGS_LIST, "AST_CARGS_LIST", NULL    },
+    { AST_OPEN_BR   , "AST_OPEN_BR"   , NULL    },
+    { AST_CLOSE_BR  , "AST_CLOSE_BR"  , NULL    },
 };
 
 ast_t *astCreate(int type, hash_t *symbol, ast_t *c0, ast_t *c1, ast_t *c2, ast_t *c3);
