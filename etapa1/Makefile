@@ -6,3 +6,6 @@ lex.yy.c: scanner.l
 
 clean:
 	rm etapa1 lex.yy.c
+
+tgz:
+	tar cvzf etapa1.tgz .

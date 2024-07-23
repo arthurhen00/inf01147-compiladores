@@ -29,3 +29,6 @@ hash_table.o: hash_table.c
 
 clean:
 	rm etapa2 lex.yy.c y.tab.c y.tab.h *.o
+
+tgz:
+	tar cvzf etapa2.tgz .

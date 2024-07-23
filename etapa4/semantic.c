@@ -552,7 +552,6 @@ void checkVector(ast_t *astNode) {
                         semanticErrors++;
                     } else {
                         // soma
-                        fprintf(stderr, "Soma: %d\n", getExprRes(astNode->children[0]));
                         if (( getExprRes(astNode->children[0])  
                             > atoi(astNode->symbol->ast->children[1]->children[0]->symbol->str) - 1)
                                 && astNode->symbol->ast->children[1] != astNode) { // O filho do meu pai nao deve ser eu

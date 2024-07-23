@@ -32,3 +32,6 @@ ast.o: ast.c
 
 clean:
 	rm etapa3 lex.yy.c y.tab.c y.tab.h *.o
+
+tgz:
+	tar cvzf etapa3.tgz .
