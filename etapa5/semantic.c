@@ -1,7 +1,3 @@
-// Compiladores - Etapa 5 - Marcelo Johann - 2024/01
-// Arthur Hendges da Silva - 00332968
-// 
-
 #include "semantic.h"
 #include "stdlib.h"
 
@@ -20,7 +16,9 @@ void checkAndSetDeclarations(ast_t *astNode) {
                 fprintf(stderr, "Semantic ERROR: Variable '%s' already declared.\n", astNode->symbol->str);
             }
             astNode->symbol->type = SYMBOL_VAR;
-            astNode->symbol->datatype = inferDataType2(astNode); break; case AST_VEC_DEC:
+            astNode->symbol->datatype = inferDataType2(astNode); 
+            break; 
+        case AST_VEC_DEC:
             if (astNode->children[1]->symbol->type != SYMBOL_IDENTIFIER) {
                 semanticErrors++;
                 fprintf(stderr, "Semantic ERROR: Vector '%s' already declared.\n", astNode->children[1]->symbol->str);
@@ -248,6 +246,11 @@ void checkOperands(ast_t *astNode) {
 
 // INT and CHAR are valid as numeric
 int isNumeric(ast_t *astNode) {
+    if (astNode->type == AST_INT
+        || astNode->type == AST_CHAR) {
+        return 1;
+    }
+
     if (isArithOp(astNode)
         && isNumeric(astNode->children[0]) 
         && isNumeric(astNode->children[1])) {
@@ -269,6 +272,7 @@ int isNumeric(ast_t *astNode) {
         || astNode->type == AST_VEC
         || astNode->type == AST_FUNC
         || astNode->type == AST_ASSIGN
+        || astNode->type == AST_VEC_ASSIGN
         || astNode->type == AST_VAR_DEC
         || astNode->type == AST_READ
         || astNode->type == AST_ARG) {
@@ -282,6 +286,10 @@ int isNumeric(ast_t *astNode) {
 
 // FLOAT is valid as real
 int isReal(ast_t *astNode) {
+    if (astNode->type == AST_FLOAT) {
+        return 1;
+    }
+
     if (isArithOp(astNode)  
         && isReal(astNode->children[0]) 
         && isReal(astNode->children[1])) {
@@ -303,6 +311,7 @@ int isReal(ast_t *astNode) {
         || astNode->type == AST_VEC
         || astNode->type == AST_FUNC
         || astNode->type == AST_ASSIGN
+        || astNode->type == AST_VEC_ASSIGN
         || astNode->type == AST_VAR_DEC
         || astNode->type == AST_READ
         || astNode->type == AST_ARG) {
@@ -316,6 +325,10 @@ int isReal(ast_t *astNode) {
 
 // TRUE and FALSE are valid as boolean
 int isBoolean(ast_t *astNode) {
+    if (astNode->type == AST_BOOL) {
+        return 1;
+    }
+
     if (isRelationalOp(astNode)  
         && ((isNumeric(astNode->children[0]) && isNumeric(astNode->children[1]))
             || (isReal(astNode->children[0]) && isReal(astNode->children[1])))) {
@@ -349,6 +362,7 @@ int isBoolean(ast_t *astNode) {
         || astNode->type == AST_VEC
         || astNode->type == AST_FUNC
         || astNode->type == AST_ASSIGN
+        || astNode->type == AST_VEC_ASSIGN
         || astNode->type == AST_VAR_DEC
         || astNode->type == AST_READ
         || astNode->type == AST_ARG) {
@@ -444,7 +458,11 @@ void checkIdentifiers(ast_t *astNode) {
                 semanticErrors++;
             }
             break;
-        default:
+        case AST_VEC_ASSIGN:
+            if (astNode->symbol->type != SYMBOL_VEC ) {
+                fprintf(stderr, "6Semantic ERROR: Incorrect usage of identifier. '%s' is not a vector.\n", astNode->symbol->str);
+                semanticErrors++;
+            }
             break;
     }
 
@@ -473,25 +491,26 @@ void checkAssign(ast_t *astNode) {
 
     switch (astNode->type) {
         case AST_ASSIGN:
-            if (!(isBoolean(astNode) && isBoolean(astNode->children[0]))) {   
-                if (!(isNumeric(astNode) && isNumeric(astNode->children[0]))) {    
-                    if (!(isReal(astNode) && isReal(astNode->children[0]))) {
-                        fprintf(stderr, "1Semantic ERROR: incompatible assign types.\n");
-                        semanticErrors++;
-                    }
-                }   
-            }
+                if (!(isBoolean(astNode) && isBoolean(astNode->children[0]))) {   
+                    if (!(isNumeric(astNode) && isNumeric(astNode->children[0]))) {    
+                        if (!(isReal(astNode) && isReal(astNode->children[0]))) {
+                            fprintf(stderr, "1Semantic ERROR: assignment with incompatible type for '%s'.\n", astNode->symbol->str);
+                            semanticErrors++;
+                        }
+                    }   
+                }
             break;
         case AST_VEC_ASSIGN:
-            if (!(isBoolean(astNode->children[0]) && isBoolean(astNode->children[1]))) {
-                if (!(isNumeric(astNode->children[0]) && isNumeric(astNode->children[1]))) {    
-                    if (!(isReal(astNode->children[0]) && isReal(astNode->children[1]))) {    
-                        fprintf(stderr, "2Semantic ERROR: incompatible assign types.\n");
-                        semanticErrors++;
+                if (!(isBoolean(astNode) && isBoolean(astNode->children[1]))) {
+                    if (!(isNumeric(astNode) && isNumeric(astNode->children[1]))) {    
+                        if (!(isReal(astNode) && isReal(astNode->children[1]))) {    
+                            fprintf(stderr, "2Semantic ERROR: assignment with incompatible type for '%s'.\n", astNode->symbol->str);
+                            semanticErrors++;
+                        }
                     }
                 }
-            }
             break;
+
         // Declarations assign
         case AST_VAR_DEC:
             if (!(isBoolean(astNode) && isBoolean(astNode->children[1]))) {
@@ -505,26 +524,22 @@ void checkAssign(ast_t *astNode) {
             break;
         case AST_VEC_DEC:
             if (astNode->children[2]) { // with list
-                if (nodesDataType[astNode->children[0]->type] == DATATYPE_BOOL) {
-                    if (!isBoolean(astNode->children[2])) {
-                        fprintf(stderr, "4.1Semantic ERROR: incompatible type in declaration.\n");
-                        semanticErrors++;
-                    }
-                } else if (nodesDataType[astNode->children[0]->type] == DATATYPE_FLOAT) {
-                    if (!isReal(astNode->children[2])) {
-                        fprintf(stderr, "4.2Semantic ERROR: incompatible type in declaration.\n");
-                        semanticErrors++;
-                    }
-                } if (nodesDataType[astNode->children[0]->type] == DATATYPE_INT
-                        || nodesDataType[astNode->children[0]->type] == DATATYPE_CHAR) {
-                    if (!isNumeric(astNode->children[2])) {
-                        fprintf(stderr, "4.3Semantic ERROR: incompatible type in declaration.\n");
-                        semanticErrors++;
-                    }
+                if (isBoolean(astNode->children[0])
+                    && !isBoolean(astNode->children[2])) {
+                    fprintf(stderr, "Semantic ERROR: incompatible type in declaration. '%s' expects a boolean list.\n", astNode->children[1]->symbol->str);
+                    semanticErrors++;
+                } else if (isReal(astNode->children[0])
+                            && !isReal(astNode->children[2])) {
+                    fprintf(stderr, "Semantic ERROR: incompatible type in declaration. '%s' expects a real list.\n", astNode->children[1]->symbol->str);
+                    semanticErrors++;
+                } if (isNumeric(astNode->children[0])
+                        && !isNumeric(astNode->children[2])) {
+                    fprintf(stderr, "Semantic ERROR: incompatible type in declaration. '%s' expects a numeric list.\n", astNode->children[1]->symbol->str);
+                    semanticErrors++;
                 }
 
                 if (atoi(astNode->children[1]->children[0]->symbol->str) != getLitListSize(astNode->children[2])) {
-                    fprintf(stderr, "5Semantic ERROR: incorrect use of vector size.\n");
+                    fprintf(stderr, "Semantic ERROR: incorrect use of vector size.\n");
                     semanticErrors++;
                 }
             }
@@ -537,6 +552,7 @@ void checkAssign(ast_t *astNode) {
     
 }
 
+//
 void checkVector(ast_t *astNode) {
     if (astNode == NULL) {
         return;
@@ -546,33 +562,49 @@ void checkVector(ast_t *astNode) {
         case AST_VEC:
             if (astNode->symbol->type == SYMBOL_VEC) {
                 if (!isNumeric(astNode->children[0])) {
-                    fprintf(stderr, "Semantic ERROR: invalid type for array index.\n");
+                    fprintf(stderr, "Semantic ERROR: index of vector '%s' must be a numeric type.\n", astNode->symbol->str);
                     semanticErrors++;
                 }
-                if (astNode->children[0]->type != AST_SYMBOL) {
-                    // somar expr se for int char
-                    if (!isNumeric(astNode->children[0])) {
-                        fprintf(stderr, "Semantic ERROR: invalid type for array index.\n");
+                // unnecessary if else, can use getExprRes in both cases
+                if (astNode->children[0]->type != AST_SYMBOL) { // when you have an expr inside []
+                    if (( getExprRes(astNode->children[0])  
+                        > atoi(astNode->symbol->ast->children[1]->children[0]->symbol->str) - 1)
+                            && astNode->symbol->ast->children[1] != astNode) { // O filho do meu pai nao deve ser eu
+                        fprintf(stderr, "1.1Semantic ERROR: index out of bounds in Arith.\n");
                         semanticErrors++;
-                    } else {
-                        // soma
-                        if (( getExprRes(astNode->children[0])  
-                            > atoi(astNode->symbol->ast->children[1]->children[0]->symbol->str) - 1)
-                                && astNode->symbol->ast->children[1] != astNode) { // O filho do meu pai nao deve ser eu
-                            fprintf(stderr, "Semantic ERROR: index out of bounds in Arith.\n");
-                            semanticErrors++;
-                        }
                     }
                 } else {
                     if ((atoi(astNode->children[0]->symbol->str)  
                         > atoi(astNode->symbol->ast->children[1]->children[0]->symbol->str) - 1)
                             && astNode->symbol->ast->children[1] != astNode) { // O filho do meu pai nao deve ser eu
-                        fprintf(stderr, "Semantic ERROR: index out of bounds.\n");
+                        fprintf(stderr, "1.2Semantic ERROR: index out of bounds.\n");
                         semanticErrors++;
                     }
                 }
-                break;
             }
+            break;
+        case AST_VEC_ASSIGN:
+            if (astNode->symbol->type == SYMBOL_VEC) {
+                if (!isNumeric(astNode->children[0])) {
+                    fprintf(stderr, "Semantic ERROR: index of vector '%s' must be a numeric type.\n", astNode->symbol->str);
+                    semanticErrors++;
+                }
+                // unnecessary if else, can use getExprRes in both cases
+                if (astNode->children[0]->type != AST_SYMBOL) {
+                    if (( getExprRes(astNode->children[0])  
+                        > atoi(astNode->symbol->ast->children[1]->children[0]->symbol->str) - 1)) {
+                        fprintf(stderr, "2.1Semantic ERROR: index out of bounds in Arith.\n");
+                        semanticErrors++;
+                    }
+                } else {
+                    if (atoi(astNode->children[0]->symbol->str) - 1 
+                        > atoi(astNode->symbol->ast->children[1]->children[0]->symbol->str)) {
+                        fprintf(stderr, "2.2Semantic ERROR: index out of bounds.\n");
+                        semanticErrors++;
+                    }
+                }
+            }
+            break;
     }
 
     for (int i = 0; i < MAX_CHILDREN; i++) {

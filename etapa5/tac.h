@@ -34,6 +34,8 @@
 #define TAC_CALL       24
 #define TAC_PRINT      25
 #define TAC_READ       26
+#define TAC_PARAM      27
+#define TAC_VEC_READ   28
 
 const static char *tacNames[] = {
     [TAC_SYMBOL] = "TAC_SYMBOL",
@@ -62,6 +64,8 @@ const static char *tacNames[] = {
     [TAC_CALL] = "TAC_CALL",
     [TAC_PRINT] = "TAC_PRINT",
     [TAC_READ] = "TAC_READ",
+    [TAC_PARAM] = "TAC_PARAM",
+    [TAC_VEC_READ] = "TAC_VEC_READ",
 };
 
 const static int ASTTOTAC[] = {

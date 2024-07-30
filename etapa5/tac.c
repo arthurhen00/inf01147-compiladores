@@ -59,7 +59,7 @@ tac_t *generateCode(ast_t *astNode) {
             break;
         case AST_VEC_ASSIGN:
             // HERE
-            res = tacJoin(code[0], tacJoin(code[1], tacCreate(TAC_VEC_ASSIGN, astNode->children[0]->symbol, code[0]->op0, code[1]->op0)));
+            res = tacJoin(code[1], tacCreate(TAC_VEC_ASSIGN, astNode->symbol, code[0]->op0, code[1]->op0));
             break;
         case AST_IF:
             if (astNode->children[2]) { // IFTHENELSE
@@ -112,7 +112,7 @@ tac_t *generateCode(ast_t *astNode) {
             }
             break;
         case AST_ARG:
-            res = tacCreate(TAC_ARG, astNode->symbol, NULL, NULL);
+            res = tacCreate(TAC_PARAM, astNode->symbol, NULL, NULL);
             break;
         case AST_ARG_LIST:
             // HERE
@@ -158,8 +158,8 @@ tac_t *generateCode(ast_t *astNode) {
 
             break;
         case AST_VEC:
-            if (astNode->symbol->ast->children[1] != astNode) { // o filho do meu pai nao deve ser eu (declaracaoa de vetor, nao chamada)
-                res = tacCreate(TAC_CALL, makeTemp(), astNode->symbol, code[0]->op0);
+            if (astNode->symbol->ast->children[1] != astNode) {
+                res = tacCreate(TAC_VEC_READ, makeTemp(), astNode->symbol, code[0]->op0);
             }
             break;
         default:

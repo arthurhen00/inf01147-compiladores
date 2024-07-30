@@ -1,5 +1,5 @@
 %{
-// Compiladores - Etapa 5 - Marcelo Johann - 2024/01
+// Compiladores - Etapa 4 - Marcelo Johann - 2024/01
 // Arthur Hendges da Silva - 00332968
 // 
 
@@ -118,37 +118,37 @@ block: '{' cmd_list '}' { $$ = astCreate(AST_BLOCK, NULL, $2  , NULL, NULL, NULL
 cmd_list: cmd cmd_list { $$ = astCreate(AST_CMD_LIST, NULL, $1, $2  , NULL, NULL); }
         | cmd          { $$ = astCreate(AST_CMD_LIST, NULL, $1, NULL, NULL, NULL); }
         ;
-cmd: ';'                                { $$ = astCreate(AST_EMPTY_CMD , NULL, NULL, NULL, NULL, NULL); }
-   | block                              { $$ = $1; }
-   | TK_IDENTIFIER '=' expr ';'         { $$ = astCreate(AST_ASSIGN    , $1  , $3  , NULL, NULL, NULL); }
-   | arr_call '=' expr ';'              { $$ = astCreate(AST_VEC_ASSIGN, NULL, $1  , $3  , NULL, NULL); }
-   | KW_PRINT type expr ';'             { $$ = astCreate(AST_PRINT     , NULL, $2  , $3  , NULL, NULL); }
-   | KW_PRINT LIT_STRING ';'            { $$ = astCreate(AST_PRINT     , $2  , NULL, NULL, NULL, NULL); }
-   | KW_READ type TK_IDENTIFIER ';'     { $$ = astCreate(AST_READ      , $3  , $2  , NULL, NULL, NULL); }
-   | KW_RETURN expr ';'                 { $$ = astCreate(AST_RETURN    , NULL, $2  , NULL, NULL, NULL); }
-   | KW_IF '(' expr ')' cmd KW_ELSE cmd { $$ = astCreate(AST_IF        , NULL, $3  , $5  , $7  , NULL); }
-   | KW_IF '(' expr ')' cmd             { $$ = astCreate(AST_IF        , NULL, $3  , $5  , NULL, NULL); }
-   | KW_WHILE '(' expr ')' cmd          { $$ = astCreate(AST_WHILE     , NULL, $3  , $5  , NULL, NULL); }
+cmd: ';'                                     { $$ = astCreate(AST_EMPTY_CMD , NULL, NULL, NULL, NULL, NULL); }
+   | block                                   { $$ = $1; }
+   | TK_IDENTIFIER '=' expr ';'              { $$ = astCreate(AST_ASSIGN    , $1  , $3  , NULL, NULL, NULL); }
+   | TK_IDENTIFIER '[' expr ']' '=' expr ';' { $$ = astCreate(AST_VEC_ASSIGN, $1  , $3  , $6  , NULL, NULL); }
+   | KW_PRINT type expr ';'                  { $$ = astCreate(AST_PRINT     , NULL, $2  , $3  , NULL, NULL); }
+   | KW_PRINT LIT_STRING ';'                 { $$ = astCreate(AST_PRINT     , $2  , NULL, NULL, NULL, NULL); }
+   | KW_READ type TK_IDENTIFIER ';'          { $$ = astCreate(AST_READ      , $3  , $2  , NULL, NULL, NULL); }
+   | KW_RETURN expr ';'                      { $$ = astCreate(AST_RETURN    , NULL, $2  , NULL, NULL, NULL); }
+   | KW_IF '(' expr ')' cmd KW_ELSE cmd      { $$ = astCreate(AST_IF        , NULL, $3  , $5  , $7  , NULL); }
+   | KW_IF '(' expr ')' cmd                  { $$ = astCreate(AST_IF        , NULL, $3  , $5  , NULL, NULL); }
+   | KW_WHILE '(' expr ')' cmd               { $$ = astCreate(AST_WHILE     , NULL, $3  , $5  , NULL, NULL); }
    ;
 
-expr: literal                { $$ = astCreate(AST_SYMBOL , $1  , NULL, NULL, NULL, NULL); }
-    | TK_IDENTIFIER          { $$ = astCreate(AST_SYMBOL , $1  , NULL, NULL, NULL, NULL); }
+expr: literal                { $$ = astCreate(AST_SYMBOL, $1  , NULL, NULL, NULL, NULL); }
+    | TK_IDENTIFIER          { $$ = astCreate(AST_SYMBOL, $1  , NULL, NULL, NULL, NULL); }
     | arr_call               { $$ = $1; }
     | func_call              { $$ = $1; }
-    | expr '+' expr          { $$ = astCreate(AST_ADD    , NULL, $1  , $3  , NULL, NULL); }
-    | expr '-' expr          { $$ = astCreate(AST_SUB    , NULL, $1  , $3  , NULL, NULL); }
-    | expr '*' expr          { $$ = astCreate(AST_MUL    , NULL, $1  , $3  , NULL, NULL); }
-    | expr '/' expr          { $$ = astCreate(AST_DIV    , NULL, $1  , $3  , NULL, NULL); }
-    | expr '>' expr          { $$ = astCreate(AST_GT     , NULL, $1  , $3  , NULL, NULL); }
-    | expr '<' expr          { $$ = astCreate(AST_LT     , NULL, $1  , $3  , NULL, NULL); }
-    | expr OPERATOR_LE expr  { $$ = astCreate(AST_LE     , NULL, $1  , $3  , NULL, NULL); } 
-    | expr OPERATOR_GE expr  { $$ = astCreate(AST_GE     , NULL, $1  , $3  , NULL, NULL); }
-    | expr OPERATOR_EQ expr  { $$ = astCreate(AST_EQ     , NULL, $1  , $3  , NULL, NULL); }
-    | expr OPERATOR_DIF expr { $$ = astCreate(AST_DIF    , NULL, $1  , $3  , NULL, NULL); }
-    | expr '&' expr          { $$ = astCreate(AST_AND    , NULL, $1  , $3  , NULL, NULL); }
-    | expr '|' expr          { $$ = astCreate(AST_OR     , NULL, $1  , $3  , NULL, NULL); }
-    | expr '~' expr          { $$ = astCreate(AST_NOT    , NULL, $1  , $3  , NULL, NULL); }
-    | '(' expr ')'           { $$ = astCreate(AST_OPEN_BR, NULL, $2  , NULL, NULL, NULL); }
+    | expr '+' expr          { $$ = astCreate(AST_ADD   , NULL, $1  , $3  , NULL, NULL); }
+    | expr '-' expr          { $$ = astCreate(AST_SUB   , NULL, $1  , $3  , NULL, NULL); }
+    | expr '*' expr          { $$ = astCreate(AST_MUL   , NULL, $1  , $3  , NULL, NULL); }
+    | expr '/' expr          { $$ = astCreate(AST_DIV   , NULL, $1  , $3  , NULL, NULL); }
+    | expr '>' expr          { $$ = astCreate(AST_GT    , NULL, $1  , $3  , NULL, NULL); }
+    | expr '<' expr          { $$ = astCreate(AST_LT    , NULL, $1  , $3  , NULL, NULL); }
+    | expr OPERATOR_LE expr  { $$ = astCreate(AST_LE    , NULL, $1  , $3  , NULL, NULL); } 
+    | expr OPERATOR_GE expr  { $$ = astCreate(AST_GE    , NULL, $1  , $3  , NULL, NULL); }
+    | expr OPERATOR_EQ expr  { $$ = astCreate(AST_EQ    , NULL, $1  , $3  , NULL, NULL); }
+    | expr OPERATOR_DIF expr { $$ = astCreate(AST_DIF   , NULL, $1  , $3  , NULL, NULL); }
+    | expr '&' expr          { $$ = astCreate(AST_AND   , NULL, $1  , $3  , NULL, NULL); }
+    | expr '|' expr          { $$ = astCreate(AST_OR    , NULL, $1  , $3  , NULL, NULL); }
+    | expr '~' expr          { $$ = astCreate(AST_NOT   , NULL, $1  , $3  , NULL, NULL); }
+    | '(' expr ')'           { $$ = astCreate(AST_OPEN_BR,NULL, $2  , NULL, NULL, NULL); }
     ;
 
 %%

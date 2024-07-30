@@ -1,4 +1,4 @@
-// Compiladores - Etapa 5 - Marcelo Johann - 2024/01
+// Compiladores - Etapa 4 - Marcelo Johann - 2024/01
 // Arthur Hendges da Silva - 00332968
 // 
 
@@ -111,7 +111,10 @@ void astOutputRec(FILE *arq, ast_t *astNode) {
             break;
         case AST_VEC_ASSIGN:                        // AST_VEC=expr;
             // does not have an identifier
+            fprintf(arq, "%s", astNode->symbol->str);
+            fprintf(arq, "[");
             astOutputRec(arq, astNode->children[0]);
+            fprintf(arq, "]");
             fprintf(arq, "=");
             astOutputRec(arq, astNode->children[1]);
             fprintf(arq, ";");
