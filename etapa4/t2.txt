@@ -27,7 +27,7 @@ int main ()
    read int a;
 
 
-   a[1] = 13; // ERRO a não é vetor
+   a[11] = 13; // ERRO a não é vetor
    a = a(123); // ERRO a não é funcao
    v[3123] = 1; //ERRO out of bounds
    v[3.3] = 3.3; //ERRO  indice float e tipo do valor errado
