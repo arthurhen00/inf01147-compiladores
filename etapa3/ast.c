@@ -112,7 +112,10 @@ void astOutputRec(FILE *arq, ast_t *astNode) {
             break;
         case AST_VEC_ASSIGN:                        // AST_VEC=expr;
             // does not have an identifier
+            fprintf(arq, "%s", astNode->symbol->str);
+            fprintf(arq, "[");
             astOutputRec(arq, astNode->children[0]);
+            fprintf(arq, "]");
             fprintf(arq, "=");
             astOutputRec(arq, astNode->children[1]);
             fprintf(arq, ";");
