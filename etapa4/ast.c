@@ -80,7 +80,6 @@ void astOutputRec(FILE *arq, ast_t *astNode) {
         case AST_DIF:
         case AST_AND:
         case AST_OR:
-        case AST_NOT:
             // may not have an identifier
             if (astNode->symbol) {
                 fprintf(arq, "%s", astNode->symbol->str);
@@ -88,6 +87,14 @@ void astOutputRec(FILE *arq, ast_t *astNode) {
                 astOutputRec(arq, astNode->children[0]);
                 fprintf(arq, "%s", AST_INFOS[astNode->type].expr); 
                 astOutputRec(arq, astNode->children[1]);
+            }
+            break;
+        case AST_NOT:
+            if (astNode->symbol) {
+                fprintf(arq, "%s", astNode->symbol->str);
+            } else {
+                fprintf(arq, "%s", AST_INFOS[astNode->type].expr);
+                astOutputRec(arq, astNode->children[0]);
             }
             break;
         case AST_INT:

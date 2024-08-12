@@ -51,8 +51,10 @@ tac_t *generateCode(ast_t *astNode) {
         case AST_DIF:
         case AST_AND:
         case AST_OR:
-        case AST_NOT:        
             res = tacJoin(tacJoin(code[0], code[1]), tacCreate(ASTTOTAC[astNode->type], makeTemp(), code[0]->op0, code[1]->op0));
+            break;
+        case AST_NOT:
+            res = tacCreate(ASTTOTAC[astNode->type], makeTemp(), code[0]->op0, NULL);
             break;
         case AST_ASSIGN:
             res = tacJoin(code[0], tacCreate(TAC_ASSIGN, astNode->symbol, code[0]->op0, NULL));

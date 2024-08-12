@@ -1,3 +1,7 @@
+// Compiladores - Etapa 5 - Marcelo Johann - 2024/01
+// Arthur Hendges da Silva - 00332968
+//
+
 #include "semantic.h"
 #include "stdlib.h"
 
@@ -16,7 +20,12 @@ void checkAndSetDeclarations(ast_t *astNode) {
                 fprintf(stderr, "Semantic ERROR: Variable '%s' already declared.\n", astNode->symbol->str);
             }
             astNode->symbol->type = SYMBOL_VAR;
-            astNode->symbol->datatype = inferDataType2(astNode); 
+            astNode->symbol->datatype = inferDataType2(astNode);
+
+            // Hash points to AST dec value, use in asm generates
+            if (astNode->type == AST_VAR_DEC) {
+                astNode->symbol->ast = astNode; 
+            }
             break; 
         case AST_VEC_DEC:
             if (astNode->children[1]->symbol->type != SYMBOL_IDENTIFIER) {
@@ -131,9 +140,14 @@ void checkOperands(ast_t *astNode) {
             break;
         case AST_AND:
         case AST_OR:
-        case AST_NOT:
             if (!isBoolean(astNode->children[0]) || !isBoolean(astNode->children[1])) {
                 fprintf(stderr, "4Semantic ERROR: invalid type for operator.\n");
+                semanticErrors++;    
+            }
+            break;
+        case AST_NOT:
+            if (!isBoolean(astNode->children[0])) {
+                fprintf(stderr, "4.1Semantic ERROR: invalid type for operator.\n");
                 semanticErrors++;    
             }
             break;
@@ -335,7 +349,8 @@ int isBoolean(ast_t *astNode) {
         return 1;
     }
     
-    if (astNode->type == AST_OPEN_BR
+    if ((astNode->type == AST_OPEN_BR
+        || astNode->type == AST_NOT)
         && isBoolean(astNode->children[0])) {
     	return 1;
     }
@@ -628,6 +643,11 @@ int getExprRes(ast_t *astNode) {
 
     if (astNode->type == AST_OPEN_BR) {
         return getExprRes(astNode->children[0]);
+    }
+
+    // TODO
+    if (astNode->symbol->ast) {
+        return atoi(astNode->symbol->ast->children[1]->symbol->str);
     }
 
     return atoi(astNode->symbol->str);
