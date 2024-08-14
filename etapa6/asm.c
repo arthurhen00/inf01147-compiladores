@@ -315,7 +315,7 @@ void generateAsm(tac_t *node) {
                         "\t" "ucomiss %%xmm1, %%xmm0"   "\n"
                         "\t" "cmovne %%edx, %%eax"      "\n"
                         "\t" "movzbl %%al, %%eax"       "\n"
-                        
+
                         "\t" "movl %%eax, _%s(%%rip)"   "\n"
                                                         "\n"
                     , aux->op1->str
@@ -464,10 +464,37 @@ void generateAsm(tac_t *node) {
                 break;
             case TAC_CALL:
                 order = 0;
+                if (aux->op0->datatype == DATATYPE_FLOAT) {
+                    fprintf(file,
+                        "\t" "call %s"                "\n"
+                        "\t" "movd %%xmm0, %%eax"     "\n"
+                        "\t" "movl %%eax, _%s(%%rip)" "\n"
+                                                      "\n"
+                    , aux->op1->str
+                    , aux->op0->str);
+                } else {
+                    fprintf(file,
+                        "\t" "call %s"                "\n"
+                        "\t" "movl %%eax, _%s(%%rip)" "\n"
+                                                      "\n"
+                    , aux->op1->str
+                    , aux->op0->str);
+                }
                 break;
             case TAC_READ:
                 break;
             case TAC_RETURN:
+                if (aux->op0->datatype == DATATYPE_FLOAT) {
+                    fprintf(file,
+                        "\t" "movss _%s(%%rip), %%xmm0" "\n"
+                                                        "\n"
+                    , aux->op0->str);
+                } else {
+                    fprintf(file,
+                        "\t" "movl _%s(%%rip), %%eax" "\n"
+                                                     "\n"
+                    , aux->op0->str);
+                }
                 break;
             default:
                 break;
@@ -487,7 +514,11 @@ void printAsmFromHT(FILE *file, hash_t *table[]) {
         for (hashNode = table[i]; hashNode; hashNode = hashNode->next) {
             if (hashNode->type == SYMBOL_VAR) {
                 fprintf(file, "_%s:" "\n", hashNode->str);
-                if (hashNode->ast->children[1]->symbol->type == SYMBOL_LIT_INT) {
+                if (!hashNode->ast) { // SYMBOL_VAR = ARG/PARAM
+                    fprintf(file,
+                        "\t" ".long %s" "\n"
+                    , "0"); // Dont need init
+                } else if (hashNode->ast->children[1]->symbol->type == SYMBOL_LIT_INT) {
                     fprintf(file,
                         "\t" ".long %s" "\n"
                     , hashNode->ast->children[1]->symbol->str);

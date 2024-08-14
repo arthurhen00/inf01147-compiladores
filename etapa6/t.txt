@@ -1,72 +1,11 @@
 
-float a: 5.2;
-float b: 5.1;
-float c: 5.3;
+float funcao() {
+    return 999.999;
+}
+
+float res: 11.11;
 
 int main(){
-   
-    print bool a > b;
-    print "\n";
-    print bool a > a;
-    print "\n";
-    print bool a > c;
-    print "\n";
-
-    print "\n";
-
-    print bool a < b;
-    print "\n";
-    print bool a < a;
-    print "\n";
-    print bool a < c;
-    print "\n";
-
-    print "\n";
-
-    print bool a >= b;
-    print "\n";
-    print bool a >= a;
-    print "\n";
-    print bool a >= c;
-    print "\n";
-
-    print "\n";
-
-    print bool a <= b;
-    print "\n";
-    print bool a <= a;
-    print "\n";
-    print bool a <= c;
-    print "\n";
-
-    print "\n";
-
-    print bool a == b;
-    print "\n";
-    print bool a == a;
-    print "\n";
-    print bool a == c;
-    print "\n";
-
-    print "\n";
-
-    print bool a != b;
-    print "\n";
-    print bool a != a;
-    print "\n";
-    print bool a != c;
-    print "\n";
-
-    print "\n";
-    print "\n";
-
-    print bool ~true;
-    print "\n";
-    print bool ~false;
-    print "\n";
-    print bool ~true & ~true;
-    print "\n";
-    print bool true & true;
-    print "\n";
-
+    res = funcao();
+    print float res;
 }

@@ -1,14 +1,13 @@
 #include <stdio.h>
 
-float a = 1.5;
-float b = 0.2;
+float funcao() {
+    return 999.99;
+}
 
-int res;
+float res = 0;
 
 int main() {
     
-    res = a != b;
-
-    printf("%d", res);
+    res = funcao();
 
 }

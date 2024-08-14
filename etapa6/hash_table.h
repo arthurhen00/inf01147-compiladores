@@ -40,6 +40,7 @@
 
 #define SYMBOL_LABEL        26
 #define SYMBOL_TEMP         27
+#define SYMBOL_ARG          28
 
 #define DATATYPE_INT   1
 #define DATATYPE_FLOAT 2
