@@ -72,19 +72,7 @@ void generateAsm(tac_t *node) {
                 );
                 break;
             case TAC_ADD:
-                if (aux->op1->datatype == DATATYPE_INT
-                    || aux->op1->datatype == DATATYPE_CHAR) {
-                    fprintf(stderr, ".....................%s %s %s\n", aux->op1->str, aux->op2->str, aux->op0->str);
-                    fprintf(file,
-                        "\t" "movl _%s(%%rip), %%edx" "\n"
-                        "\t" "movl _%s(%%rip), %%eax" "\n"
-                        "\t" "addl %%edx, %%eax"      "\n"
-                        "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                      "\n"
-                    , aux->op1->str
-                    , aux->op2->str
-                    , aux->op0->str);
-                } else {
+                if (aux->op1->datatype == DATATYPE_FLOAT) {
                     fprintf(file,
                         "\t" "movss _%s(%%rip), %%xmm1" "\n"
                         "\t" "movss _%s(%%rip), %%xmm0" "\n"
@@ -94,119 +82,258 @@ void generateAsm(tac_t *node) {
                     , aux->op1->str
                     , aux->op2->str
                     , aux->op0->str);
+                } else {
+                    fprintf(file,
+                        "\t" "movl _%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s(%%rip), %%eax" "\n"
+                        "\t" "addl %%edx, %%eax"      "\n"
+                        "\t" "movl %%eax, _%s(%%rip)" "\n"
+                                                      "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
                 }
                 break;
             case TAC_SUB:
-                fprintf(file,
-                    "\t" "movl _%s(%%rip), %%eax" "\n"
-                    "\t" "movl _%s(%%rip), %%edx" "\n"
-                    "\t" "subl %%edx, %%eax"      "\n"
-                    "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                  "\n"
-                , aux->op1->str
-                , aux->op2->str
-                , aux->op0->str);
+                if (aux->op1->datatype == DATATYPE_FLOAT) {
+                    fprintf(file,
+                        "\t" "movss _%s(%%rip), %%xmm0" "\n"
+                        "\t" "movss _%s(%%rip), %%xmm1" "\n"
+                        "\t" "subss %%xmm1, %%xmm0"     "\n"
+                        "\t" "movss %%xmm0, _%s(%%rip)" "\n"
+                                                        "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                } else {
+                    fprintf(file,
+                        "\t" "movl _%s(%%rip), %%eax" "\n"
+                        "\t" "movl _%s(%%rip), %%edx" "\n"
+                        "\t" "subl %%edx, %%eax"      "\n"
+                        "\t" "movl %%eax, _%s(%%rip)" "\n"
+                                                      "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                }
                 break;
             case TAC_MUL:
-                fprintf(file,
-                    "\t" "movl _%s(%%rip), %%edx" "\n"
-                    "\t" "movl _%s(%%rip), %%eax" "\n"
-                    "\t" "imul %%edx, %%eax"      "\n"
-                    "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                  "\n"
-                , aux->op1->str
-                , aux->op2->str
-                , aux->op0->str);
+                if (aux->op1->datatype == DATATYPE_FLOAT) {
+                    fprintf(file,
+                        "\t" "movss _%s(%%rip), %%xmm1" "\n"
+                        "\t" "movss _%s(%%rip), %%xmm0" "\n"
+                        "\t" "mulss %%xmm1, %%xmm0"     "\n"
+                        "\t" "movss %%xmm0, _%s(%%rip)" "\n"
+                                                        "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                } else {
+                    fprintf(file,
+                        "\t" "movl _%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s(%%rip), %%eax" "\n"
+                        "\t" "imul %%edx, %%eax"      "\n"
+                        "\t" "movl %%eax, _%s(%%rip)" "\n"
+                                                      "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                }
                 break;
             case TAC_DIV:
-                fprintf(file,
-                    "\t" "movl _%s(%%rip), %%eax" "\n"
-                    "\t" "movl _%s(%%rip), %%ecx" "\n"
-                    "\t" "cltd"                   "\n"
-                    "\t" "idivl	%%ecx"            "\n"
-                    "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                  "\n"
-                , aux->op1->str
-                , aux->op2->str
-                , aux->op0->str);
+                if (aux->op1->datatype == DATATYPE_FLOAT) {
+                    fprintf(file,
+                        "\t" "movss _%s(%%rip), %%xmm0" "\n"
+                        "\t" "movss _%s(%%rip), %%xmm1" "\n"
+                        "\t" "divss %%xmm1, %%xmm0"     "\n"
+                        "\t" "movss %%xmm0, _%s(%%rip)" "\n"
+                                                        "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                } else {
+                    fprintf(file,
+                        "\t" "movl _%s(%%rip), %%eax" "\n"
+                        "\t" "movl _%s(%%rip), %%ecx" "\n"
+                        "\t" "cltd"                   "\n"
+                        "\t" "idivl	%%ecx"            "\n"
+                        "\t" "movl %%eax, _%s(%%rip)" "\n"
+                                                      "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                }
                 break;
             case TAC_GT:
-                fprintf(file,
-                    "\t" "movl _%s(%%rip), %%edx" "\n"
-                    "\t" "movl _%s(%%rip), %%eax" "\n"
-                    "\t" "cmpl %%eax, %%edx"      "\n"
-                    "\t" "setg %%al"              "\n"
-	                "\t" "movzbl %%al, %%eax"     "\n"
-	                "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                  "\n"
-                , aux->op1->str
-                , aux->op2->str
-                , aux->op0->str);
+                if (aux->op1->datatype == DATATYPE_FLOAT) {
+                    fprintf(file,
+                        "\t" "movss _%s(%%rip), %%xmm0" "\n"
+                        "\t" "movss _%s(%%rip), %%xmm1" "\n"
+                        "\t" "comiss %%xmm1, %%xmm0"    "\n"
+                        "\t" "seta %%al"                "\n"
+                        "\t" "movzbl %%al, %%eax"       "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                } else {
+                    fprintf(file,
+                        "\t" "movl _%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s(%%rip), %%eax" "\n"
+                        "\t" "cmpl %%eax, %%edx"      "\n"
+                        "\t" "setg %%al"              "\n"
+                        "\t" "movzbl %%al, %%eax"     "\n"
+                        "\t" "movl %%eax, _%s(%%rip)" "\n"
+                                                      "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                }
                 break;
             case TAC_LT:
-                fprintf(file,
-                    "\t" "movl _%s(%%rip), %%edx" "\n"
-                    "\t" "movl _%s(%%rip), %%eax" "\n"
-                    "\t" "cmpl %%eax, %%edx"      "\n"
-                    "\t" "setl %%al"              "\n"
-	                "\t" "movzbl %%al, %%eax"     "\n"
-	                "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                  "\n"
-                , aux->op1->str
-                , aux->op2->str
-                , aux->op0->str);
+                if (aux->op1->datatype == DATATYPE_FLOAT) {
+                    fprintf(file,
+                        "\t" "movss _%s(%%rip), %%xmm1" "\n"
+                        "\t" "movss _%s(%%rip), %%xmm0" "\n"
+                        "\t" "comiss %%xmm1, %%xmm0"    "\n"
+                        "\t" "seta %%al"                "\n"
+                        "\t" "movzbl %%al, %%eax"       "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                } else {
+                    fprintf(file,
+                        "\t" "movl _%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s(%%rip), %%eax" "\n"
+                        "\t" "cmpl %%eax, %%edx"      "\n"
+                        "\t" "setl %%al"              "\n"
+                        "\t" "movzbl %%al, %%eax"     "\n"
+                        "\t" "movl %%eax, _%s(%%rip)" "\n"
+                                                    "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                }
                 break;
             case TAC_GE:
-                fprintf(file,
-                    "\t" "movl _%s(%%rip), %%edx" "\n"
-                    "\t" "movl _%s(%%rip), %%eax" "\n"
-                    "\t" "cmpl %%eax, %%edx"      "\n"
-                    "\t" "setge %%al"             "\n"
-	                "\t" "movzbl %%al, %%eax"     "\n"
-	                "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                  "\n"
-                , aux->op1->str
-                , aux->op2->str
-                , aux->op0->str);
+                if (aux->op1->datatype == DATATYPE_FLOAT) {
+                    fprintf(file,
+                        "\t" "movss _%s(%%rip), %%xmm0" "\n"
+                        "\t" "movss _%s(%%rip), %%xmm1" "\n"
+                        "\t" "comiss %%xmm1, %%xmm0"    "\n"
+                        "\t" "setnb %%al"               "\n"
+                        "\t" "movzbl %%al, %%eax"       "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                } else {
+                    fprintf(file,
+                        "\t" "movl _%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s(%%rip), %%eax" "\n"
+                        "\t" "cmpl %%eax, %%edx"      "\n"
+                        "\t" "setge %%al"             "\n"
+                        "\t" "movzbl %%al, %%eax"     "\n"
+                        "\t" "movl %%eax, _%s(%%rip)" "\n"
+                                                    "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                }
                 break;
             case TAC_LE:
-                fprintf(file,
-                    "\t" "movl _%s(%%rip), %%edx" "\n"
-                    "\t" "movl _%s(%%rip), %%eax" "\n"
-                    "\t" "cmpl %%eax, %%edx"      "\n"
-                    "\t" "setle %%al"             "\n"
-	                "\t" "movzbl %%al, %%eax"     "\n"
-	                "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                  "\n"
-                , aux->op1->str
-                , aux->op2->str
-                , aux->op0->str);
+                if (aux->op1->datatype == DATATYPE_FLOAT) {
+                    fprintf(file,
+                        "\t" "movss _%s(%%rip), %%xmm1" "\n"
+                        "\t" "movss _%s(%%rip), %%xmm0" "\n"
+                        "\t" "comiss %%xmm1, %%xmm0"    "\n"
+                        "\t" "setnb %%al"               "\n"
+                        "\t" "movzbl %%al, %%eax"       "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                } else {
+                    fprintf(file,
+                        "\t" "movl _%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s(%%rip), %%eax" "\n"
+                        "\t" "cmpl %%eax, %%edx"      "\n"
+                        "\t" "setle %%al"             "\n"
+                        "\t" "movzbl %%al, %%eax"     "\n"
+                        "\t" "movl %%eax, _%s(%%rip)" "\n"
+                                                      "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                }
                 break;
             case TAC_EQ:
-                fprintf(file,
-                    "\t" "movl _%s(%%rip), %%edx" "\n"
-                    "\t" "movl _%s(%%rip), %%eax" "\n"
-                    "\t" "cmpl %%eax, %%edx"      "\n"
-                    "\t" "sete %%al"              "\n"
-                    "\t" "movzbl %%al, %%eax"     "\n"
-                    "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                  "\n"
-                , aux->op1->str
-                , aux->op2->str
-                , aux->op0->str);
+                if (aux->op1->datatype == DATATYPE_FLOAT) {
+                    fprintf(file,
+                        "\t" "movss _%s(%%rip), %%xmm0" "\n"
+                        "\t" "movss _%s(%%rip), %%xmm1" "\n"
+                        "\t" "ucomiss %%xmm1, %%xmm0"   "\n"
+                        "\t" "setnp %%al"               "\n"
+                        "\t" "movl $0, %%edx"           "\n"
+                        "\t" "ucomiss %%xmm1, %%xmm0"   "\n"
+                        "\t" "cmovne %%edx, %%eax"      "\n"
+                        "\t" "movzbl %%al, %%eax"       "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                } else {
+                    fprintf(file,
+                        "\t" "movl _%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s(%%rip), %%eax" "\n"
+                        "\t" "cmpl %%eax, %%edx"      "\n"
+                        "\t" "sete %%al"              "\n"
+                        "\t" "movzbl %%al, %%eax"     "\n"
+                        "\t" "movl %%eax, _%s(%%rip)" "\n"
+                                                      "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                }
                 break;
             case TAC_DIF:
-                fprintf(file,
-                    "\t" "movl _%s(%%rip), %%edx" "\n"
-                    "\t" "movl _%s(%%rip), %%eax" "\n"
-                    "\t" "cmpl %%eax, %%edx"      "\n"
-                    "\t" "setne %%al"             "\n"
-                    "\t" "movzbl %%al, %%eax"     "\n"
-                    "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                  "\n"
-                , aux->op1->str
-                , aux->op2->str
-                , aux->op0->str);
+                if (aux->op1->datatype == DATATYPE_FLOAT) {
+                    fprintf(file,
+                        "\t" "movss _%s(%%rip), %%xmm0" "\n"
+                        "\t" "movss _%s(%%rip), %%xmm1" "\n"
+
+                        "\t" "ucomiss %%xmm1, %%xmm0"   "\n"
+                        "\t" "setp %%al"               "\n"
+                        "\t" "movl $1, %%edx"           "\n"
+
+                        "\t" "ucomiss %%xmm1, %%xmm0"   "\n"
+                        "\t" "cmovne %%edx, %%eax"      "\n"
+                        "\t" "movzbl %%al, %%eax"       "\n"
+                        
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                } else {
+                    fprintf(file,
+                        "\t" "movl _%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s(%%rip), %%eax" "\n"
+                        "\t" "cmpl %%eax, %%edx"      "\n"
+                        "\t" "setne %%al"             "\n"
+                        "\t" "movzbl %%al, %%eax"     "\n"
+                        "\t" "movl %%eax, _%s(%%rip)" "\n"
+                                                      "\n"
+                    , aux->op1->str
+                    , aux->op2->str
+                    , aux->op0->str);
+                }
                 break;
             case TAC_AND:
                 fprintf(file,

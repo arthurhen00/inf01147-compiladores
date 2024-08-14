@@ -1,7 +1,14 @@
 #include <stdio.h>
 
+float a = 1.5;
+float b = 0.2;
+
+int res;
 
 int main() {
-        printf("string 1");
-        printf("string 2");
+    
+    res = a != b;
+
+    printf("%d", res);
+
 }

@@ -92,6 +92,8 @@ tac_t *generateCode(ast_t *astNode) {
         case AST_SUB:
         case AST_MUL:
         case AST_DIV:
+            res = tacJoin(tacJoin(code[0], code[1]), tacCreate(ASTTOTAC[astNode->type], makeTemp(astNode->children[1]->symbol->datatype), code[0]->op0, code[1]->op0));
+            break;
         case AST_GT:
         case AST_LT:
         case AST_GE:
@@ -100,7 +102,7 @@ tac_t *generateCode(ast_t *astNode) {
         case AST_DIF:
         case AST_AND:
         case AST_OR:
-            res = tacJoin(tacJoin(code[0], code[1]), tacCreate(ASTTOTAC[astNode->type], makeTemp(astNode->children[1]->symbol->datatype), code[0]->op0, code[1]->op0));
+            res = tacJoin(tacJoin(code[0], code[1]), tacCreate(ASTTOTAC[astNode->type], makeTemp(DATATYPE_BOOL), code[0]->op0, code[1]->op0));
             break;
         case AST_NOT:
             res = tacCreate(ASTTOTAC[astNode->type], makeTemp(astNode->children[0]->symbol->datatype), code[0]->op0, NULL);

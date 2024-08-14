@@ -1,10 +1,28 @@
 	.file	"t.c"
 	.text
+	.globl	a
+	.data
+	.align 4
+	.type	a, @object
+	.size	a, 4
+a:
+	.long	1069547520
+	.globl	b
+	.align 4
+	.type	b, @object
+	.size	b, 4
+b:
+	.long	1045220557
+	.globl	res
+	.bss
+	.align 4
+	.type	res, @object
+	.size	res, 4
+res:
+	.zero	4
 	.section	.rodata
 .LC0:
-	.string	"string 1"
-.LC1:
-	.string	"string 2"
+	.string	"%d"
 	.text
 	.globl	main
 	.type	main, @function
@@ -17,11 +35,21 @@ main:
 	.cfi_offset 6, -16
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 6
+
+	movss	a(%rip), %xmm0
+	movss	b(%rip), %xmm1
+
+	ucomiss	%xmm1, %xmm0
+	setp	%al
+	movl	$1, %edx
+	
+	ucomiss	%xmm1, %xmm0
+	cmovne	%edx, %eax
+	movzbl	%al, %eax
+	movl	%eax, res(%rip)
+	movl	res(%rip), %eax
+	movl	%eax, %esi
 	leaq	.LC0(%rip), %rax
-	movq	%rax, %rdi
-	movl	$0, %eax
-	call	printf@PLT
-	leaq	.LC1(%rip), %rax
 	movq	%rax, %rdi
 	movl	$0, %eax
 	call	printf@PLT
