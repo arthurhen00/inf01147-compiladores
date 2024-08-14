@@ -1,11 +1,57 @@
+int main(){
+    print int funcao(100, 101);
+    print "\n";
+    print int funcao1(200, 201);
+    print "\n";
 
-float funcao() {
-    return 999.999;
+    print "\n";
+    
+    print float funcaoF(100.11, 101.11);
+    print "\n";
+    print float funcao1F(200.11, 201.11);
+    print "\n";
 }
 
-float res: 11.11;
+int funcao(int a, int b) {
+    print int a;
+    print "\n";
 
-int main(){
-    res = funcao();
-    print float res;
+    print int b;
+    print "\n";
+    
+    print "\n";
+    return 1000;
+}
+
+int funcao1(int c, int d) {
+    print int c;
+    print "\n";
+
+    print int d;
+    print "\n";
+    
+    print "\n";
+    return 2000;
+}
+
+float funcaoF(float aF, float bF) {
+    print float aF;
+    print "\n";
+
+    print float bF;
+    print "\n";
+    
+    print "\n";
+    return 1000.11;
+}
+
+float funcao1F(float cF, float dF) {
+    print float cF;
+    print "\n";
+
+    print float dF;
+    print "\n";
+    
+    print "\n";
+    return 2000.11;
 }

@@ -456,9 +456,28 @@ void generateAsm(tac_t *node) {
                                    "\n"
                 , aux->op0->str);
                 break;
-            case TAC_ARG:
+            case TAC_ARG: {
+                ast_t *argDecList = aux->op1->ast->children[1];
                 order++;
+                for (int i = 1; i < order; i++) {
+                    argDecList = argDecList->children[1];
+                }
+                if (aux->op0->datatype == DATATYPE_FLOAT) {
+                    fprintf(file,
+                        "\t" "movss _%s(%%rip), %%xmm0" "\n"
+                        "\t" "movss %%xmm0, _%s(%%rip)" "\n",
+                        aux->op0->str, 
+                        argDecList->children[0]->symbol->str
+                    );
+                } else {
+                    fprintf(file,
+                        "\t" "movl _%s(%%rip), %%eax" "\n"
+                        "\t" "movl %%eax, _%s(%%rip)" "\n"
+                    , aux->op0->str
+                    , argDecList->children[0]->symbol->str);
+                }
                 break;
+            }
             case TAC_PARAM:
                 order++;
                 break;
@@ -482,6 +501,19 @@ void generateAsm(tac_t *node) {
                 }
                 break;
             case TAC_READ:
+                if (aux->op0->datatype == DATATYPE_FLOAT) {
+
+                } else {
+                    fprintf(file,
+                        "\t" "leaq _%s(%%rip), %%rax"  "\n"
+                        "\t" "movq %%rax, %%rsi"       "\n"
+                        "\t" "leaq .%s(%%rip), %%rax"  "\n"
+                        "\t" "movq %%rax, %%rdi"       "\n"
+                        "\t" "call __isoc99_scanf@PLT" "\n"
+                                                       "\n"
+                    , aux->op0->str
+                    , stringType[aux->op0->datatype]);
+                }
                 break;
             case TAC_RETURN:
                 if (aux->op0->datatype == DATATYPE_FLOAT) {

@@ -181,6 +181,11 @@ tac_t *generateCode(ast_t *astNode) {
         case AST_FUNC:
             //res = tacJoin(tacCreate(TAC_CALL, makeTemp(), astNode->symbol, NULL), code[0]); // args after call
             res = tacJoin(code[0], tacCreate(TAC_CALL, makeTemp(astNode->symbol->datatype), astNode->symbol, NULL));
+            tac_t *aux = res->prev;
+            while (aux && aux->type == TAC_ARG) {
+                aux->op1 = astNode->symbol;
+                aux = aux->prev;
+            }
             break;
         case AST_CARGS_LIST:
             res = tacJoin(tacCreate(TAC_ARG, code[0]->op0, NULL, NULL), code[1]); // ordem dos args call
