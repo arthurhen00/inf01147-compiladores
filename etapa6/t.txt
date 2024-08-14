@@ -1,0 +1,26 @@
+//int Integer[2]: 10 11;
+//float Real[2]: 9.99 11.11;
+//char Letra[2]: 'a' 'b';
+//bool Boolean[2]: false false;
+//
+//int Integer1: 999;
+//float Real1: 999.999;
+//char Letra1: 'c';
+//bool Boolean1: true;
+
+int vetor[10];
+int i: 0;
+
+int main (){
+    while (i < 10) {
+        print int i;
+        print int vetor[i];
+        i = i + 1;
+        vetor[i] = i;
+    }
+    print int vetor[7];
+    print int vetor[8];
+    print int vetor[9];
+
+
+}

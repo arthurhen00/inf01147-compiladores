@@ -79,12 +79,14 @@ void hashPrint() {
     }
 }
 
-hash_t *makeTemp() {
+hash_t *makeTemp(int dataType) {
     static int num = 0;
     char buffer[256];
 
     sprintf(buffer, "temp%d", num++);
-    return hashInsert(buffer, SYMBOL_TEMP);
+    hash_t *newHash = hashInsert(buffer, SYMBOL_TEMP);
+    newHash->datatype = dataType;
+    return newHash;
 }
 
 hash_t *makeLabel() {

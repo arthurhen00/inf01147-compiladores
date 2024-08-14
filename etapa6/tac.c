@@ -100,10 +100,10 @@ tac_t *generateCode(ast_t *astNode) {
         case AST_DIF:
         case AST_AND:
         case AST_OR:
-            res = tacJoin(tacJoin(code[0], code[1]), tacCreate(ASTTOTAC[astNode->type], makeTemp(), code[0]->op0, code[1]->op0));
+            res = tacJoin(tacJoin(code[0], code[1]), tacCreate(ASTTOTAC[astNode->type], makeTemp(astNode->children[1]->symbol->datatype), code[0]->op0, code[1]->op0));
             break;
         case AST_NOT:
-            res = tacCreate(ASTTOTAC[astNode->type], makeTemp(), code[0]->op0, NULL);
+            res = tacCreate(ASTTOTAC[astNode->type], makeTemp(astNode->children[0]->symbol->datatype), code[0]->op0, NULL);
             break; 
         case AST_ASSIGN:
             res = tacJoin(code[0], tacCreate(TAC_ASSIGN, astNode->symbol, code[0]->op0, NULL));
@@ -178,7 +178,7 @@ tac_t *generateCode(ast_t *astNode) {
             break;
         case AST_FUNC:
             //res = tacJoin(tacCreate(TAC_CALL, makeTemp(), astNode->symbol, NULL), code[0]); // args after call
-            res = tacJoin(code[0], tacCreate(TAC_CALL, makeTemp(), astNode->symbol, NULL));
+            res = tacJoin(code[0], tacCreate(TAC_CALL, makeTemp(astNode->symbol->datatype), astNode->symbol, NULL));
             break;
         case AST_CARGS_LIST:
             res = tacJoin(tacCreate(TAC_ARG, code[0]->op0, NULL, NULL), code[1]); // ordem dos args call
@@ -211,7 +211,7 @@ tac_t *generateCode(ast_t *astNode) {
         }
         case AST_VEC:
             if (astNode->symbol->ast->children[1] != astNode) {
-                res = tacCreate(TAC_VEC_READ, makeTemp(), astNode->symbol, code[0]->op0);
+                res = tacCreate(TAC_VEC_READ, makeTemp(astNode->symbol->datatype), astNode->symbol, code[0]->op0);
             }
             break;
         default:

@@ -40,7 +40,7 @@ asm.o: asm.c
 	$(CC) -c asm.c $(CFLAGS)
 
 clean:
-	rm etapa6 lex.yy.c y.tab.c y.tab.h *.o
+	rm etapa6 lex.yy.c y.tab.c y.tab.h *.o *.s
 
 tgz:
 	tar cvzf etapa6.tgz .

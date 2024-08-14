@@ -59,7 +59,7 @@ int hashHorner(char *str);
 hash_t *hashSearch(char *str);
 hash_t *hashInsert(char *str, int type);
 void hashPrint();
-hash_t *makeTemp();
+hash_t *makeTemp(int dataType);
 hash_t *makeLabel();
 
 #endif // HASH_TABLE_HEADER
