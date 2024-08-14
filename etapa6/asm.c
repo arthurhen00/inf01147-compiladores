@@ -35,18 +35,18 @@ void generateAsm(tac_t *node) {
 
     // Init
     fprintf(file,
-             ".LC0:"              "\n"
-        "\t" ".string \"%%d\\n\"" "\n"
+             ".LC0:"           "\n"
+        "\t" ".string \"%%d\"" "\n"
 
-             ".LC1:"              "\n"
-        "\t" ".string \"%%c\\n\"" "\n"
+             ".LC1:"           "\n"
+        "\t" ".string \"%%c\"" "\n"
 
-             ".LC2:"              "\n"
-        "\t" ".string \"%%f\\n\"" "\n"
+             ".LC2:"           "\n"
+        "\t" ".string \"%%f\"" "\n"
 
-             ".LC3:"              "\n"
-        "\t" ".string \"%%d\\n\"" "\n"
-                                  "\n"
+             ".LC3:"           "\n"
+        "\t" ".string \"%%d\"" "\n"
+                               "\n"
     );
     
     // tac
@@ -284,7 +284,7 @@ void generateAsm(tac_t *node) {
                         "\t" "movq %%rax, %%rdi"      "\n"
                         "\t" "call printf@PLT"        "\n"
                                                       "\n"
-                    , aux->op0->str);
+                    , asciiRepresentation(aux->op0->str));
                 } else if (aux->op0->datatype == DATATYPE_FLOAT) {
                     fprintf(file,
                         "\t" "movss	_%s(%%rip), %%xmm0" "\n"
@@ -447,12 +447,11 @@ void printAsmFromHT(FILE *file, hash_t *table[]) {
                     ? 1 
                     : 0);
             } else if (hashNode->type == SYMBOL_LIT_STRING) {
-                int binRep;
-                memcpy(&binRep, hashNode->str, sizeof(int));
+                char* ascii_str = asciiRepresentation(hashNode->str);
                 fprintf(file,
                     "_%s:"          "\n"
                     "\t" ".string %s" "\n"
-                , hashNode->str
+                , ascii_str
                 , hashNode->str);
             }
             
@@ -465,4 +464,31 @@ void printAsmFromHT(FILE *file, hash_t *table[]) {
             }
         }
     }
+}
+
+// TODO macete maximo
+char* asciiRepresentation(const char* str) {
+    if (str == NULL) return NULL;
+
+    int len = strlen(str);
+   
+    int max_size = len * 5;
+    
+    char* ascii_str = (char*)malloc(max_size * sizeof(char));
+    if (ascii_str == NULL) return NULL;
+
+    ascii_str[0] = '\0';
+
+    for (int i = 0; i < len; i++) {
+        char buffer[5];
+        sprintf(buffer, "%d", (int)str[i]);
+        strcat(ascii_str, buffer);
+    }
+
+    int last_index = strlen(ascii_str) - 1;
+    if (ascii_str[last_index] == ' ') {
+        ascii_str[last_index] = '\0';
+    }
+
+    return ascii_str;
 }

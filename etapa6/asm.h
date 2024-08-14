@@ -15,4 +15,6 @@ extern const char *opASM[];
 void generateAsm(tac_t *node);
 void printAsmFromHT(FILE *file, hash_t *table[]);
 
+char* asciiRepresentation(const char* str);
+
 #endif // ASM_HEADER
