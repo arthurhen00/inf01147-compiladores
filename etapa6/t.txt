@@ -8,19 +8,19 @@
 //char Letra1: 'c';
 //bool Boolean1: true;
 
-int vetor[10];
+int vetor[10]: 1000 1001 1002 1003 1004 1005 1006 1007 1008 1009;
 int i: 0;
 
 int main (){
+    
     while (i < 10) {
         print int i;
         print int vetor[i];
-        i = i + 1;
-        vetor[i] = i;
+
+        i = i+1;
     }
-    print int vetor[7];
-    print int vetor[8];
-    print int vetor[9];
+ 
+    print int i;
 
 
 }

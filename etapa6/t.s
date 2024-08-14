@@ -1,8 +1,25 @@
 	.file	"t.c"
 	.text
-	.section	.rodata
-.LC0:
-	.string	"TESTE"
+	.globl	vetor
+	.bss
+	.align 32
+	.type	vetor, @object
+	.size	vetor, 40
+vetor:
+	.zero	40
+	.globl	i
+	.data
+	.align 4
+	.type	i, @object
+	.size	i, 4
+i:
+	.long	1
+	.globl	a
+	.align 4
+	.type	a, @object
+	.size	a, 4
+a:
+	.long	2
 	.text
 	.globl	main
 	.type	main, @function
@@ -10,10 +27,14 @@ main:
 .LFB0:
 	pushq	%rbp
 	movq	%rsp, %rbp
-
-	leaq	.LC0(%rip), %rax
-	movq	%rax, %rdi
-	call	printf@PLT
+	
+	movl	a(%rip), %eax
+	cltq
+	leaq	0(,%rax,4), %rdx
+	leaq	vetor(%rip), %rax
+	movl	(%rdx,%rax), %eax
+	movl	%eax, i(%rip)
+	movl	$0, %eax
 
 	popq	%rbp
 	ret

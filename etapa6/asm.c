@@ -243,11 +243,17 @@ void generateAsm(tac_t *node) {
                 break;
             case TAC_VEC_READ:
                 fprintf(file,
-                    "\t" "movl %d+_%s(%%rip), %%eax" "\n"
+                    "\t" "movl _%s(%%rip), %%eax"    "\n"
+                    "\t" "cltq"                      "\n"
+                    "\t" "leaq 0(,%%rax,4), %%rdx"   "\n"
+                    "\t" "leaq _%s(%%rip), %%rax"    "\n"
+                    "\t" "movl (%%rdx,%%rax), %%eax" "\n"
                     "\t" "movl %%eax, _%s(%%rip)"    "\n"
-                                                     "\n"
-                , atoi(aux->op2->str) * 4
-                , aux->op1->str, aux->op0->str);
+                    "\n",
+                    aux->op2->str,
+                    aux->op1->str,
+                    aux->op0->str
+                );
                 break;
             case TAC_ASSIGN:
                 fprintf(file, 
@@ -259,12 +265,17 @@ void generateAsm(tac_t *node) {
                 break;
             case TAC_VEC_ASSIGN:
                 fprintf(file, 
-                	"\t" "movl %d+_%s(%%rip), %%eax" "\n"
-	                "\t" "movl %%eax, _%s(%%rip)"    "\n"
-                                                     "\n"
-                , atoi(aux->op1->str) * 4
-                , aux->op2->str
-                , aux->op0->str);
+                	"\t" "movl _%s(%%rip), %%eax"     "\n"
+                	"\t" "cltq"                       "\n"
+                	"\t" "leaq 0(,%%rax, %d), %%rdx"  "\n"
+                	"\t" "leaq _%s(%%rip), %%rax"     "\n"
+                	"\t" "movl _%s(%%rip), %%ebx"     "\n"
+	                "\t" "movl %%ebx, (%%rdx, %%rax)" "\n"
+                                                      "\n"
+                , aux->op1->str
+                , 4
+                , aux->op0->str
+                , aux->op2->str);
                 break;
             case TAC_PRINT:
                 if (aux->op0->type == SYMBOL_LIT_STRING) {
