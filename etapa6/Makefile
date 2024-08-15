@@ -45,11 +45,6 @@ clean:
 tgz:
 	tar cvzf etapa6.tgz .
 
-test:
-	gcc t.c -S
-	gcc t.s -o t.exe
-	./t.exe
-
 t:
 	make
 	./etapa6 t.txt

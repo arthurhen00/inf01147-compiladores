@@ -1,57 +1,24 @@
-int main(){
-    print int funcao(100, 101);
-    print "\n";
-    print int funcao1(200, 201);
-    print "\n";
 
-    print "\n";
-    
-    print float funcaoF(100.11, 101.11);
-    print "\n";
-    print float funcao1F(200.11, 201.11);
-    print "\n";
-}
+float a: 1.1;
+char b: 'a';
+int c: 1;
 
-int funcao(int a, int b) {
-    print int a;
-    print "\n";
+int main() {
 
-    print int b;
-    print "\n";
-    
-    print "\n";
-    return 1000;
-}
+    read int c;
 
-int funcao1(int c, int d) {
     print int c;
     print "\n";
 
-    print int d;
-    print "\n";
-    
-    print "\n";
-    return 2000;
-}
+    read char b;
 
-float funcaoF(float aF, float bF) {
-    print float aF;
+    print char b;
     print "\n";
 
-    print float bF;
-    print "\n";
-    
-    print "\n";
-    return 1000.11;
-}
 
-float funcao1F(float cF, float dF) {
-    print float cF;
+    read float a;
+
+    print float a;
     print "\n";
 
-    print float dF;
-    print "\n";
-    
-    print "\n";
-    return 2000.11;
 }

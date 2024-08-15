@@ -501,9 +501,7 @@ void generateAsm(tac_t *node) {
                 }
                 break;
             case TAC_READ:
-                if (aux->op0->datatype == DATATYPE_FLOAT) {
-
-                } else {
+                
                     fprintf(file,
                         "\t" "leaq _%s(%%rip), %%rax"  "\n"
                         "\t" "movq %%rax, %%rsi"       "\n"
@@ -513,7 +511,7 @@ void generateAsm(tac_t *node) {
                                                        "\n"
                     , aux->op0->str
                     , stringType[aux->op0->datatype]);
-                }
+                
                 break;
             case TAC_RETURN:
                 if (aux->op0->datatype == DATATYPE_FLOAT) {
