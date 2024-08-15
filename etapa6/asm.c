@@ -72,7 +72,7 @@ void generateAsm(tac_t *node) {
                 );
                 break;
             case TAC_ADD:
-                if (aux->op1->datatype == DATATYPE_FLOAT) {
+                if (aux->op1->datatype == DATATYPE_FLOAT) { // float expressions only accept float in other op 
                     fprintf(file,
                         "\t" "movss _%s(%%rip), %%xmm1" "\n"
                         "\t" "movss _%s(%%rip), %%xmm0" "\n"
@@ -84,12 +84,14 @@ void generateAsm(tac_t *node) {
                     , aux->op0->str);
                 } else {
                     fprintf(file,
-                        "\t" "movl _%s(%%rip), %%edx" "\n"
-                        "\t" "movl _%s(%%rip), %%eax" "\n"
-                        "\t" "addl %%edx, %%eax"      "\n"
-                        "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                      "\n"
+                        "\t" "movl _%s%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s%s(%%rip), %%eax" "\n"
+                        "\t" "addl %%edx, %%eax"        "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op1->str
+                    , aux->op2->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op2->str
                     , aux->op0->str);
                 }
@@ -107,12 +109,14 @@ void generateAsm(tac_t *node) {
                     , aux->op0->str);
                 } else {
                     fprintf(file,
-                        "\t" "movl _%s(%%rip), %%eax" "\n"
-                        "\t" "movl _%s(%%rip), %%edx" "\n"
-                        "\t" "subl %%edx, %%eax"      "\n"
-                        "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                      "\n"
+                        "\t" "movl _%s%s(%%rip), %%eax" "\n"
+                        "\t" "movl _%s%s(%%rip), %%edx" "\n"
+                        "\t" "subl %%edx, %%eax"        "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op1->str
+                    , aux->op2->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op2->str
                     , aux->op0->str);
                 }
@@ -130,12 +134,14 @@ void generateAsm(tac_t *node) {
                     , aux->op0->str);
                 } else {
                     fprintf(file,
-                        "\t" "movl _%s(%%rip), %%edx" "\n"
-                        "\t" "movl _%s(%%rip), %%eax" "\n"
-                        "\t" "imul %%edx, %%eax"      "\n"
-                        "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                      "\n"
+                        "\t" "movl _%s%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s%s(%%rip), %%eax" "\n"
+                        "\t" "imul %%edx, %%eax"        "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op1->str
+                    , aux->op2->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op2->str
                     , aux->op0->str);
                 }
@@ -153,13 +159,15 @@ void generateAsm(tac_t *node) {
                     , aux->op0->str);
                 } else {
                     fprintf(file,
-                        "\t" "movl _%s(%%rip), %%eax" "\n"
-                        "\t" "movl _%s(%%rip), %%ecx" "\n"
-                        "\t" "cltd"                   "\n"
-                        "\t" "idivl	%%ecx"            "\n"
-                        "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                      "\n"
+                        "\t" "movl _%s%s(%%rip), %%eax" "\n"
+                        "\t" "movl _%s%s(%%rip), %%ecx" "\n"
+                        "\t" "cltd"                     "\n"
+                        "\t" "idivl	%%ecx"              "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op1->str
+                    , aux->op2->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op2->str
                     , aux->op0->str);
                 }
@@ -179,14 +187,16 @@ void generateAsm(tac_t *node) {
                     , aux->op0->str);
                 } else {
                     fprintf(file,
-                        "\t" "movl _%s(%%rip), %%edx" "\n"
-                        "\t" "movl _%s(%%rip), %%eax" "\n"
-                        "\t" "cmpl %%eax, %%edx"      "\n"
-                        "\t" "setg %%al"              "\n"
-                        "\t" "movzbl %%al, %%eax"     "\n"
-                        "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                      "\n"
+                        "\t" "movl _%s%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s%s(%%rip), %%eax" "\n"
+                        "\t" "cmpl %%eax, %%edx"        "\n"
+                        "\t" "setg %%al"                "\n"
+                        "\t" "movzbl %%al, %%eax"       "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op1->str
+                    , aux->op2->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op2->str
                     , aux->op0->str);
                 }
@@ -206,14 +216,16 @@ void generateAsm(tac_t *node) {
                     , aux->op0->str);
                 } else {
                     fprintf(file,
-                        "\t" "movl _%s(%%rip), %%edx" "\n"
-                        "\t" "movl _%s(%%rip), %%eax" "\n"
-                        "\t" "cmpl %%eax, %%edx"      "\n"
-                        "\t" "setl %%al"              "\n"
-                        "\t" "movzbl %%al, %%eax"     "\n"
-                        "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                    "\n"
+                        "\t" "movl _%s%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s%s(%%rip), %%eax" "\n"
+                        "\t" "cmpl %%eax, %%edx"        "\n"
+                        "\t" "setl %%al"                "\n"
+                        "\t" "movzbl %%al, %%eax"       "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op1->str
+                    , aux->op2->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op2->str
                     , aux->op0->str);
                 }
@@ -233,14 +245,16 @@ void generateAsm(tac_t *node) {
                     , aux->op0->str);
                 } else {
                     fprintf(file,
-                        "\t" "movl _%s(%%rip), %%edx" "\n"
-                        "\t" "movl _%s(%%rip), %%eax" "\n"
-                        "\t" "cmpl %%eax, %%edx"      "\n"
-                        "\t" "setge %%al"             "\n"
-                        "\t" "movzbl %%al, %%eax"     "\n"
-                        "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                    "\n"
+                        "\t" "movl _%s%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s%s(%%rip), %%eax" "\n"
+                        "\t" "cmpl %%eax, %%edx"        "\n"
+                        "\t" "setge %%al"               "\n"
+                        "\t" "movzbl %%al, %%eax"       "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op1->str
+                    , aux->op2->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op2->str
                     , aux->op0->str);
                 }
@@ -260,14 +274,16 @@ void generateAsm(tac_t *node) {
                     , aux->op0->str);
                 } else {
                     fprintf(file,
-                        "\t" "movl _%s(%%rip), %%edx" "\n"
-                        "\t" "movl _%s(%%rip), %%eax" "\n"
-                        "\t" "cmpl %%eax, %%edx"      "\n"
-                        "\t" "setle %%al"             "\n"
-                        "\t" "movzbl %%al, %%eax"     "\n"
-                        "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                      "\n"
+                        "\t" "movl _%s%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s%s(%%rip), %%eax" "\n"
+                        "\t" "cmpl %%eax, %%edx"        "\n"
+                        "\t" "setle %%al"               "\n"
+                        "\t" "movzbl %%al, %%eax"       "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op1->str
+                    , aux->op2->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op2->str
                     , aux->op0->str);
                 }
@@ -290,14 +306,16 @@ void generateAsm(tac_t *node) {
                     , aux->op0->str);
                 } else {
                     fprintf(file,
-                        "\t" "movl _%s(%%rip), %%edx" "\n"
-                        "\t" "movl _%s(%%rip), %%eax" "\n"
-                        "\t" "cmpl %%eax, %%edx"      "\n"
-                        "\t" "sete %%al"              "\n"
-                        "\t" "movzbl %%al, %%eax"     "\n"
-                        "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                      "\n"
+                        "\t" "movl _%s%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s%s(%%rip), %%eax" "\n"
+                        "\t" "cmpl %%eax, %%edx"        "\n"
+                        "\t" "sete %%al"                "\n"
+                        "\t" "movzbl %%al, %%eax"       "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op1->str
+                    , aux->op2->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op2->str
                     , aux->op0->str);
                 }
@@ -307,15 +325,12 @@ void generateAsm(tac_t *node) {
                     fprintf(file,
                         "\t" "movss _%s(%%rip), %%xmm0" "\n"
                         "\t" "movss _%s(%%rip), %%xmm1" "\n"
-
                         "\t" "ucomiss %%xmm1, %%xmm0"   "\n"
-                        "\t" "setp %%al"               "\n"
+                        "\t" "setp %%al"                "\n"
                         "\t" "movl $1, %%edx"           "\n"
-
                         "\t" "ucomiss %%xmm1, %%xmm0"   "\n"
                         "\t" "cmovne %%edx, %%eax"      "\n"
                         "\t" "movzbl %%al, %%eax"       "\n"
-
                         "\t" "movl %%eax, _%s(%%rip)"   "\n"
                                                         "\n"
                     , aux->op1->str
@@ -323,14 +338,16 @@ void generateAsm(tac_t *node) {
                     , aux->op0->str);
                 } else {
                     fprintf(file,
-                        "\t" "movl _%s(%%rip), %%edx" "\n"
-                        "\t" "movl _%s(%%rip), %%eax" "\n"
-                        "\t" "cmpl %%eax, %%edx"      "\n"
-                        "\t" "setne %%al"             "\n"
-                        "\t" "movzbl %%al, %%eax"     "\n"
-                        "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                      "\n"
+                        "\t" "movl _%s%s(%%rip), %%edx" "\n"
+                        "\t" "movl _%s%s(%%rip), %%eax" "\n"
+                        "\t" "cmpl %%eax, %%edx"        "\n"
+                        "\t" "setne %%al"               "\n"
+                        "\t" "movzbl %%al, %%eax"       "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op1->str
+                    , aux->op2->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op2->str
                     , aux->op0->str);
                 }
@@ -383,25 +400,36 @@ void generateAsm(tac_t *node) {
                 );
                 break;
             case TAC_ASSIGN:
-                fprintf(file, 
-                	"\t" "movl _%s(%%rip), %%eax" "\n"
-	                "\t" "movl %%eax, _%s(%%rip)" "\n"
-                                                  "\n"
-                , aux->op1->str
-                , aux->op0->str);
+                if (aux->op1->datatype == DATATYPE_FLOAT) {
+                    fprintf(file, 
+                        "\t" "movss	_%s(%%rip), %%xmm0" "\n"
+                        "\t" "movss	%%xmm0, _%s(%%rip)" "\n"
+                                                        "\n"
+                    , aux->op1->str
+                    , aux->op0->str);
+                } else {
+                    fprintf(file, 
+                        "\t" "movl _%s%s(%%rip), %%eax" "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                                                        "\n"
+                    , aux->op1->type == SYMBOL_LIT_CHAR ? "c" : ""
+                    , aux->op1->str
+                    , aux->op0->str);
+                }
                 break;
-            case TAC_VEC_ASSIGN:
+            case TAC_VEC_ASSIGN: // TODO FLOAT REG
                 fprintf(file, 
                 	"\t" "movl _%s(%%rip), %%eax"     "\n"
                 	"\t" "cltq"                       "\n"
                 	"\t" "leaq 0(,%%rax, %d), %%rdx"  "\n"
                 	"\t" "leaq _%s(%%rip), %%rax"     "\n"
-                	"\t" "movl _%s(%%rip), %%ebx"     "\n"
+                	"\t" "movl _%s%s(%%rip), %%ebx"   "\n"
 	                "\t" "movl %%ebx, (%%rdx, %%rax)" "\n"
                                                       "\n"
                 , aux->op1->str
                 , 4
                 , aux->op0->str
+                , aux->op2->type == SYMBOL_LIT_CHAR ? "c" : ""
                 , aux->op2->str);
                 break;
             case TAC_PRINT:
@@ -427,11 +455,12 @@ void generateAsm(tac_t *node) {
                     , aux->op0->str);
                 } else {
                     fprintf(file,
-                        "\t" "movl _%s(%%rip), %%esi" "\n"
-                        "\t" "leaq .%s(%%rip), %%rax" "\n"
-                        "\t" "movq %%rax, %%rdi"      "\n"
-                        "\t" "call printf@PLT"        "\n"
-                                                      "\n"
+                        "\t" "movl _%s%s(%%rip), %%esi" "\n"
+                        "\t" "leaq .%s(%%rip), %%rax"   "\n"
+                        "\t" "movq %%rax, %%rdi"        "\n"
+                        "\t" "call printf@PLT"          "\n"
+                                                        "\n"
+                    , aux->op0->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op0->str
                     , stringType[aux->op0->datatype]);
                 }
@@ -471,8 +500,9 @@ void generateAsm(tac_t *node) {
                     );
                 } else {
                     fprintf(file,
-                        "\t" "movl _%s(%%rip), %%eax" "\n"
-                        "\t" "movl %%eax, _%s(%%rip)" "\n"
+                        "\t" "movl _%s%s(%%rip), %%eax" "\n"
+                        "\t" "movl %%eax, _%s(%%rip)"   "\n"
+                    , aux->op0->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op0->str
                     , argDecList->children[0]->symbol->str);
                 }
@@ -501,7 +531,6 @@ void generateAsm(tac_t *node) {
                 }
                 break;
             case TAC_READ:
-                
                     fprintf(file,
                         "\t" "leaq _%s(%%rip), %%rax"  "\n"
                         "\t" "movq %%rax, %%rsi"       "\n"
@@ -511,7 +540,6 @@ void generateAsm(tac_t *node) {
                                                        "\n"
                     , aux->op0->str
                     , stringType[aux->op0->datatype]);
-                
                 break;
             case TAC_RETURN:
                 if (aux->op0->datatype == DATATYPE_FLOAT) {
@@ -521,8 +549,9 @@ void generateAsm(tac_t *node) {
                     , aux->op0->str);
                 } else {
                     fprintf(file,
-                        "\t" "movl _%s(%%rip), %%eax" "\n"
-                                                     "\n"
+                        "\t" "movl _%s%s(%%rip), %%eax" "\n"
+                                                        "\n"
+                    , aux->op0->type == SYMBOL_LIT_CHAR ? "c" : ""
                     , aux->op0->str);
                 }
                 break;
@@ -621,7 +650,7 @@ void printAsmFromHT(FILE *file, hash_t *table[]) {
                 , binRep);
             } else if (hashNode->type == SYMBOL_LIT_CHAR) {
                 fprintf(file,
-                    "_%s:"          "\n"
+                    "_c%s:"          "\n"
                     "\t" ".long %d" "\n"
                 , hashNode->str
                 , (int)hashNode->str[1]);

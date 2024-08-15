@@ -1,24 +1,10 @@
-
-float a: 1.1;
-char b: 'a';
-int c: 1;
-
 int main() {
 
-    read int c;
-
-    print int c;
+    print "97";
     print "\n";
 
-    read char b;
-
-    print char b;
+    print int ('a' + 'a') / 97;
     print "\n";
 
-
-    read float a;
-
-    print float a;
-    print "\n";
 
 }

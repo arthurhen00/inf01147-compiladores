@@ -91,9 +91,18 @@ tac_t *generateCode(ast_t *astNode) {
         case AST_ADD:
         case AST_SUB:
         case AST_MUL:
-        case AST_DIV:
-            res = tacJoin(tacJoin(code[0], code[1]), tacCreate(ASTTOTAC[astNode->type], makeTemp(astNode->children[1]->symbol->datatype), code[0]->op0, code[1]->op0));
+        case AST_DIV: {
+            int type;
+            if (isNumeric(astNode)) {
+                type = DATATYPE_INT;
+            } else if (isReal(astNode)) {
+                type = DATATYPE_FLOAT;
+            } else {
+                type = DATATYPE_BOOL;
+            }
+            res = tacJoin(tacJoin(code[0], code[1]), tacCreate(ASTTOTAC[astNode->type], makeTemp(type), code[0]->op0, code[1]->op0));
             break;
+        }
         case AST_GT:
         case AST_LT:
         case AST_GE:
@@ -192,6 +201,7 @@ tac_t *generateCode(ast_t *astNode) {
             break;
         case AST_PRINT:
             if (astNode->children[1]) {
+                // create different TAC for PRINT (TAC_PRINT_INT, TAC_PRINT_CHAR ...)
                 res = tacJoin(code[1], tacCreate(TAC_PRINT, code[1]->op0, NULL, NULL));
             } else { // str
                 res = tacCreate(TAC_PRINT, astNode->symbol, NULL, NULL);
