@@ -1,0 +1,10 @@
+int main() {
+
+    print "97";
+    print "\n";
+
+    print int ('a' + 'a') / 97;
+    print "\n";
+
+
+}
