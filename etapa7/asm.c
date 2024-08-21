@@ -30,6 +30,10 @@ const char *opASM[] = {
 };
 
 void generateAsm(tac_t *node) {
+    if (!node) {
+        return;
+    }
+    
     FILE *file = fopen(FILE_OUT, "w");
     static int order = 0;
 

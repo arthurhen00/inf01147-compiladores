@@ -1,10 +1,12 @@
-int main() {
+int a: 0;
+int b[3];
 
-    print "97";
-    print "\n";
+int main () {
 
-    print int ('a' + 'a') / 97;
-    print "\n";
+    a = 1;
+    b[1] = 1;
 
+    a = 1
+    b[2] = 1
 
 }

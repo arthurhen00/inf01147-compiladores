@@ -45,9 +45,7 @@ clean:
 tgz:
 	tar cvzf etapa7.tgz .
 
-t:
-	make
+fast:
+	make etapa7
 	./etapa7 t.txt
-	gcc out.s
-	./a.out
 

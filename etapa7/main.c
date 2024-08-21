@@ -20,6 +20,8 @@ extern int yyparse();
 
 char **global_argv;
 
+extern int getSyntaxErrors();
+
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         fprintf(stderr, "Usage: ./etapa7 input.txt\n");
@@ -38,8 +40,13 @@ int main(int argc, char *argv[]) {
 
     yyparse();
 
+    if (getSyntaxErrors()) {
+        fprintf(stderr, "Syntax Errors: %d\n", getSyntaxErrors());
+        exit(3);
+    }
+
     if (getSemanticErrors()) {
-        fprintf(stderr, "Errors: %d\n", getSemanticErrors());
+        fprintf(stderr, "Semantic Errors: %d\n", getSemanticErrors());
         exit(4);
     }
     

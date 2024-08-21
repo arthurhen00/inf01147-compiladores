@@ -301,6 +301,10 @@ void tacPrintBackward(tac_t *tacNode) {
 }
 
 tac_t *tacReverse(tac_t *node) {
+    if (!node) {
+        return NULL;
+    }
+
     tac_t *aux;
     for (aux = node; aux->prev; aux = aux->prev) {
         aux->prev->next = aux;
